@@ -14,9 +14,12 @@ public class mainThread {
 	private mainThread() {
 		try {
 		
-			ServerSocket server = new ServerSocket(18000);
+			ServerSocket server = new ServerSocket(80);
+			System.out.println("Serv démarré");
 			while(running) {
+				System.out.println("En attente d'une connexion");
 				new ConnectionClient(server.accept());
+				System.out.println("Nouvelle connexion accepté");
 			}
 			for (ConnectionClient c : tabClient) {
 				try {
@@ -39,5 +42,10 @@ public class mainThread {
 	public void ajouterClient(ConnectionClient c) {
 		tabClient.add(c);
 		nbClient++;
+	}
+	
+	public void closeClient(ConnectionClient c) {
+		tabClient.remove(c);
+		nbClient--;
 	}
 }
