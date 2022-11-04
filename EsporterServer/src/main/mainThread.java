@@ -26,10 +26,14 @@ public class mainThread {
 					c.getSocket().close();
 					c.getThread().join();
 			
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 			server.close();
-		} catch (IOException e) {}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	

@@ -32,7 +32,7 @@ public class ConnectionClient {
 	
 	public int login(String username, String password) {
 		if (username.equals("test") && password.equals("mdpTest"))
-			return 3;
+			return 4;
 		return -1;
 	}
 	

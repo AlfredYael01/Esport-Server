@@ -10,6 +10,7 @@ import socket.Command;
 import socket.CommandName;
 import socket.Response;
 import socket.ResponseObject;
+import types.EcurieInfo;
 import types.InfoID;
 import types.Infos;
 import types.JoueurInfo;
@@ -91,8 +92,8 @@ public class ListenClient implements Runnable{
 		} else {
 			client.setPermission(result);
 			HashMap<InfoID,Infos> m = new HashMap<>();
-			m.put(InfoID.Permission, Permission.JOUEUR);
-			m.put(InfoID.Joueur, new JoueurInfo(5,"TEST", "ok", null, null, null, null, null));
+			m.put(InfoID.Permission, Permission.ECURIE);
+			m.put(InfoID.Ecurie, new EcurieInfo("Vitality", null, "VIT", "Francaise", 0));
 			
 			ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
 			System.out.println(r);
