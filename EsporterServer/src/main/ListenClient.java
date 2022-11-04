@@ -13,6 +13,7 @@ import socket.ResponseObject;
 import types.InfoID;
 import types.Infos;
 import types.JoueurInfo;
+import types.Login;
 import types.Permission;
 
 public class ListenClient implements Runnable{
@@ -68,21 +69,7 @@ public class ListenClient implements Runnable{
 		} else {
 			switch(c.getName()) {
 				case LOGIN : 
-					int result = client.login(c.getUsername(), c.getMdp());
-					if (result == -1) {
-						ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
-						send(r);
-					} else {
-						client.setPermission(result);
-						HashMap<InfoID,Infos> m = new HashMap<>();
-						m.put(InfoID.Permission, Permission.JOUEUR);
-						m.put(InfoID.Joueur, new JoueurInfo(5,"TEST", "ok", null));
-						
-						ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
-						System.out.println(r);
-						send(r);
-						client.setIsLogin(true);
-					}
+					login(c);
 					break;
 				case VOIR_CALENDRIER:
 					break;
@@ -91,6 +78,26 @@ public class ListenClient implements Runnable{
 				default:
 					
 			}
+		}
+	}
+	
+	
+	private void login(Command c) {
+		Login l = (Login) c.getInfoByID(InfoID.login);
+		int result = client.login(l.getUsername(), l.getPassword());
+		if (result == -1) {
+			ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
+			send(r);
+		} else {
+			client.setPermission(result);
+			HashMap<InfoID,Infos> m = new HashMap<>();
+			m.put(InfoID.Permission, Permission.JOUEUR);
+			m.put(InfoID.Joueur, new JoueurInfo(5,"TEST", "ok", null, null, null, null, null));
+			
+			ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
+			System.out.println(r);
+			send(r);
+			client.setIsLogin(true);
 		}
 	}
 	
