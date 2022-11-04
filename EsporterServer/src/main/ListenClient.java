@@ -58,6 +58,7 @@ public class ListenClient implements Runnable{
 				case INSCRIPTION_TOURNOI:
 					break;
 				case VOIR_CALENDRIER:
+					
 					break;
 				case VOIR_ECURIE:
 					break;
@@ -65,30 +66,30 @@ public class ListenClient implements Runnable{
 			}
 			
 		} else {
-			if (o instanceof Command) {
-				switch(c.getName()) {
-					case LOGIN : 
-						int result = client.login(c.getUsername(), c.getMdp());
-						if (result == -1) {
-							ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
-							send(r);
-						} else {
-							client.setPermission(result);
-							HashMap<InfoID,Infos> m = new HashMap<>();
-							m.put(InfoID.Permission, Permission.JOUEUR);
-							m.put(InfoID.Joueur, new JoueurInfo(5,"TEST", "ok", null));
-							ResponseObject r = new ResponseObject(Response.REPONSE, m, null);
-							send(r);
-							client.setIsLogin(true);
-						}
-						break;
-					case VOIR_CALENDRIER:
-						break;
-					case VOIR_ECURIE:
-						break;
-					default:
+			switch(c.getName()) {
+				case LOGIN : 
+					int result = client.login(c.getUsername(), c.getMdp());
+					if (result == -1) {
+						ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
+						send(r);
+					} else {
+						client.setPermission(result);
+						HashMap<InfoID,Infos> m = new HashMap<>();
+						m.put(InfoID.Permission, Permission.JOUEUR);
+						m.put(InfoID.Joueur, new JoueurInfo(5,"TEST", "ok", null));
 						
-				}
+						ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
+						System.out.println(r);
+						send(r);
+						client.setIsLogin(true);
+					}
+					break;
+				case VOIR_CALENDRIER:
+					break;
+				case VOIR_ECURIE:
+					break;
+				default:
+					
 			}
 		}
 	}
