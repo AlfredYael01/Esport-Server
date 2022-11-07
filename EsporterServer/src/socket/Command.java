@@ -19,7 +19,7 @@ public class Command implements Serializable{
 	 */
 	private static final long serialVersionUID = -8562553476003862463L;
 	private CommandName name;
-	private Map<InfoID,Infos> info = new HashMap<>();
+	private Map<InfoID,Infos> info = new HashMap<>(); 
 	
 	
 	
