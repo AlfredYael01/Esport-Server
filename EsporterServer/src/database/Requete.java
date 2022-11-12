@@ -2,14 +2,26 @@ package database;
 
 public class Requete {
 
-	private String requete;
+	public enum typeRequete{FONCTION, REQUETE}
 	
-	private Requete(String requete) {
+	
+	private String requete;
+	private typeRequete type;
+	private Requete(String requete, typeRequete type) {
 		this.requete = requete;
+		this.type = type;
 	}
 	
 	public static String Login(String user, String pass) {
 		return null;
+	}
+	
+	public String getRequete() {
+		return requete;
+	}
+	
+	public typeRequete getType() {
+		return type;
 	}
 	
 }

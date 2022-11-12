@@ -1,53 +1,63 @@
 package database;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueueDatabase<T> {
 
-	private Map<Integer, T> queue;
+	private LinkedBlockingQueue<Entry<Integer, T>> queue;
 	private int max;
 	private int actual;
 	private int nbElement;
+	private static volatile int ID;
 	private DatabaseAccess db;
+	private final static int CAPACITY = 50;
 	
 	public QueueDatabase () {
-		queue = new HashMap<>();
+		queue = new LinkedBlockingQueue<>(CAPACITY);
 		max =0;
 		actual=0;
 		nbElement =0;
 	}
 	
-	public int put(T s) {
-		if (nbElement==0) {
+	public int put(T s) throws InterruptedException {
+		if (queue.size()==0) {
 			db.getT().notify();
 		}
-		max++;
-		nbElement++;
-		queue.put(max, s);
-		return max;
+		queue.put(new SimpleEntry<>(++ID,s));
+		return ID;
 	}
 	
-	public void put(T s, int id) {
-		queue.put(id, s);
+	public void put(T s, int id) throws InterruptedException {
+		queue.put(new SimpleEntry<>(id,s));
 	}
 	
-	public T suivant() {
-		T t = get(actual+1);
-		if (t!=null)
-			actual++;
-		return t;
-	}
-	
-	public T get(int i) {
-		if (queue.containsKey(i)) {
-			T t = queue.get(i);
-			queue.remove(i);
-			nbElement--;
-			return t;
-			
+	public Entry<Integer, T> suivant(){
+		try {
+			return queue.take();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
-		return null;
+	}
+	
+	public Entry<Integer, T> get(int id) throws InterruptedException{
+		Entry<Integer, T> t;
+		t = queue.peek();
+		while(true) {
+			if (t!=null) {
+				if (t.getKey()==id)
+					return queue.take();
+				Thread.sleep(100);
+			}
+			t = queue.peek();
+		}
 	}
 	
 	public void remove(int i) {
@@ -55,6 +65,6 @@ public class QueueDatabase<T> {
 	}
 	
 	public int getNbElement() {
-		return nbElement;
+		return queue.size();
 	}
 }
