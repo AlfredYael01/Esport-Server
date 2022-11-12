@@ -18,16 +18,20 @@ public class QueueDatabase<T> {
 	private DatabaseAccess db;
 	private final static int CAPACITY = 50;
 	
-	public QueueDatabase () {
+	public QueueDatabase (DatabaseAccess db) {
 		queue = new LinkedBlockingQueue<>(CAPACITY);
 		max =0;
 		actual=0;
 		nbElement =0;
+		this.db = db;
+		
 	}
 	
 	public int put(T s) throws InterruptedException {
 		if (queue.size()==0) {
-			db.getT().notify();
+			synchronized (db) {
+				db.notify();
+			}
 		}
 		queue.put(new SimpleEntry<>(++ID,s));
 		return ID;

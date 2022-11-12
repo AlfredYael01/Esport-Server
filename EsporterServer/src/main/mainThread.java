@@ -2,7 +2,10 @@ package main;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.sql.SQLException;
 import java.util.Vector;
+
+import database.DatabaseAccess;
 
 public class mainThread {
 
@@ -10,10 +13,11 @@ public class mainThread {
 	private boolean running=true;
 	private Vector<ConnectionClient> tabClient=new Vector<>();
 	private int nbClient=0;
+	private DatabaseAccess db;
 	
 	private mainThread() {
 		try {
-		
+			db = DatabaseAccess.getInstance();
 			ServerSocket server = new ServerSocket(80);
 			System.out.println("Serv démarré");
 			while(running) {
@@ -30,9 +34,15 @@ public class mainThread {
 					e.printStackTrace();
 				}
 			}
-			server.close();
+			try {
+				server.close();
+			} catch (IOException e) {
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
+		} catch (SQLException e1) {
+			e1.printStackTrace();
 		}
 	}
 

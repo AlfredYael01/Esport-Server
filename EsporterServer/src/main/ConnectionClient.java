@@ -1,10 +1,15 @@
-package main;
+	package main;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.SQLException;
 
+import database.DatabaseAccess;
+import database.Requete;
+import database.Requete.typeRequete;
+import database.Result;
 import types.Permission;
 
 public class ConnectionClient {
@@ -31,9 +36,25 @@ public class ConnectionClient {
 	}
 	
 	public int login(String username, String password) {
+		try {
+			Result r = DatabaseAccess.getInstance().login(new Requete(Requete.Login(username, password), typeRequete.FONCTION));
+			if (r.isError()) {
+				System.out.println("Error");
+				return -1;
+			}
+			System.out.println(r.getEntier());
+			return r.getEntier();
+		} catch (SQLException s) {
+			s.printStackTrace();
+			return -1;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return -1;
+		}
+		/*
 		if (username.equals("test") && password.equals("mdpTest"))
 			return 4;
-		return -1;
+		return -1;*/
 	}
 	
 	
