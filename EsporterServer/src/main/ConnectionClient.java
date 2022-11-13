@@ -67,6 +67,10 @@ public class ConnectionClient {
 		}
 	}
 	
+	public void setPermission(Permission perm) {
+		role = perm;
+	}
+	
 	
 	public int logout() {
 		return -1;

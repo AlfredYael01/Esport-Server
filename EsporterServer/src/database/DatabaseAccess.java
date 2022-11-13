@@ -48,7 +48,9 @@ public class DatabaseAccess {
 									CallableStatement cstmt = conn.prepareCall(r.getRequete());
 									cstmt.registerOutParameter(1, Types.INTEGER);
 									cstmt.executeUpdate();
-									rs.setEntier(cstmt.getInt(1));
+									int entier = cstmt.getInt(1);
+									rs.setEntier(entier);
+									System.out.println("Entier db : "+entier);
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -125,7 +127,7 @@ public class DatabaseAccess {
 		int id = in.put(requete);
 		Entry<Integer, Result> data;
 		data = out.get(id);
-		
+		System.out.println(data.getValue().getEntier());
 		return data.getValue();
 	}
 	

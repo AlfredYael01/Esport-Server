@@ -37,7 +37,6 @@ public class ListenClient implements Runnable{
 		while (true) {
 			try {
 				Object o = in.readObject();
-				System.out.println(o.toString());
 				commande(o);
 			} catch (ClassNotFoundException e) {
 			} catch (IOException e) {
@@ -58,6 +57,7 @@ public class ListenClient implements Runnable{
 			
 			switch(c.getName()) {
 				case LOGOUT : 
+					logout();
 					break;
 				case AJOUTER_EQUIPE:
 					break;
@@ -83,16 +83,24 @@ public class ListenClient implements Runnable{
 				case VOIR_ECURIE:
 					break;
 				default:
-					
+					errorPermission();
 			}
 		}
 	}
 	
+	private void logout() {
+		client.setIsLogin(false);
+		client.setPermission(Permission.VISITEUR);
+	}
+	
+	private void errorPermission() {
+		ResponseObject r = new ResponseObject(Response.ERROR_PERMISSION, null, null);
+		send(r);
+	}
 	
 	private void login(Command c) {
 		Login l = (Login) c.getInfoByID(InfoID.login);
 		int result = client.login(l.getUsername(), l.getPassword());
-		System.out.println(result);
 		if (result == -1) {
 			ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
 			send(r);
@@ -105,6 +113,7 @@ public class ListenClient implements Runnable{
 					send(r);
 				}
 				ResultSet rs = res.getResultSet();
+				rs.next();
 				int perm = rs.getInt("id_role");
 				client.setPermission(perm);
 				HashMap<InfoID,Infos> m = new HashMap<>();
@@ -117,7 +126,7 @@ public class ListenClient implements Runnable{
 					break;
 				case 3:
 					m.put(InfoID.Permission, Permission.JOUEUR);
-					
+					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"), rs.getBlob("photojoueur"), rs.getDate("datenaissancejoueur"), rs.getDate("datedebutcontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe")));
 					break;
 				case 4:
 					m.put(InfoID.Permission, Permission.ECURIE);
@@ -126,7 +135,6 @@ public class ListenClient implements Runnable{
 				
 				}
 				ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
-				System.out.println(r);
 				send(r);
 				client.setIsLogin(true);
 			} catch (Exception e) {
