@@ -10,6 +10,7 @@ import database.DatabaseAccess;
 import database.Requete;
 import database.Requete.typeRequete;
 import database.Result;
+import socket.ResponseObject;
 import types.Permission;
 
 public class ConnectionClient {
@@ -67,8 +68,20 @@ public class ConnectionClient {
 		}
 	}
 	
+	public Permission getRole() {
+		return role;
+	}
+	
 	public void setPermission(Permission perm) {
 		role = perm;
+	}
+	
+	public void send(ResponseObject o) {
+		try {
+			out.writeObject(o);
+		} catch (IOException e) {
+			
+		}
 	}
 	
 	

@@ -2,7 +2,7 @@ package database;
 
 public class Requete {
 
-	public enum typeRequete{FONCTION, REQUETE, PROCEDURE}
+	public enum typeRequete{FONCTION, REQUETE, PROCEDURE, INSERT}
 	
 	
 	private String requete;

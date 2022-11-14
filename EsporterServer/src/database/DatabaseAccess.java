@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.util.Map.Entry;
 
+import main.mainThread;
+
 
 public class DatabaseAccess {
 
@@ -55,6 +57,12 @@ public class DatabaseAccess {
 									e1.printStackTrace();
 									rs.setError(true);
 								}
+								try {
+									out.put(rs, id);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								
 								break;
 							case PROCEDURE:
@@ -65,6 +73,12 @@ public class DatabaseAccess {
 								} catch (SQLException e2) {
 									e2.printStackTrace();
 									rs.setError(true);
+								}
+								try {
+									out.put(rs, id);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}
 								
 								break;
@@ -78,15 +92,27 @@ public class DatabaseAccess {
 									e1.printStackTrace();
 									rs.setError(true);
 								}
+								try {
+									out.put(rs, id);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 								break;
+							case INSERT:
+								Statement st1;
+								try {
+									st1 = conn.createStatement();
+									rs.setResultSet(st1.executeQuery(r.getRequete()));
+								} catch (SQLException e1) {
+									e1.printStackTrace();
+									rs.setError(true);
+								}
+								break;
+
 							
 							}
-							try {
-								out.put(rs, id);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
+							
 						}
 					}
 				}
@@ -121,6 +147,17 @@ public class DatabaseAccess {
 		data = out.get(id);
 		
 		return data.getValue();
+	}
+	
+	public void insertData(Requete requete) throws InterruptedException {
+		int id = in.put(requete);
+		
+		
+	}
+	
+	public void insertTournoi(Requete requete) throws InterruptedException {
+		insertData(requete);
+		mainThread.getInstance().sendAll(null);
 	}
 	
 	public Result login(Requete requete) throws InterruptedException {

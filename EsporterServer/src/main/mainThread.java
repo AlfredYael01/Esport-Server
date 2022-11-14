@@ -3,9 +3,14 @@ package main;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Vector;
 
 import database.DatabaseAccess;
+import socket.Response;
+import socket.ResponseObject;
+import types.InfoID;
+import types.Infos;
 
 public class mainThread {
 
@@ -56,6 +61,43 @@ public class mainThread {
 	public void ajouterClient(ConnectionClient c) {
 		tabClient.add(c);
 		nbClient++;
+	}
+	
+	public void initializeApp() {
+		//Ecurie
+			//Equipe
+				//Joueur
+		//Tournoi
+			//Poule
+				//Rencontre
+		//Classement
+	}
+	
+	public void miseAJourData(InfoID info, Infos data) {
+		ResponseObject r;
+		HashMap<InfoID, Infos> m = new HashMap<>();
+		m.put(info, data);
+		switch (info) {
+		case Joueur:;
+			r = new ResponseObject(Response.UPDATE_JOUEUR, m, null);
+			sendAll(r);
+			break;
+		case Tournoi:
+			r = new ResponseObject(Response.UPDATE_TOURNOI, m, null);
+			sendAll(r);
+			break;
+		case Equipe:
+			r = new ResponseObject(Response.UPDATE_EQUIPE, m, null);
+			sendAll(r);
+			break;
+		} 
+		
+	}
+	
+	public void sendAll(ResponseObject response) {
+		for (ConnectionClient con : tabClient) {
+			con.send(response);
+		}
 	}
 	
 	public void closeClient(ConnectionClient c) {

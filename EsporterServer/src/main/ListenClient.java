@@ -60,6 +60,11 @@ public class ListenClient implements Runnable{
 					logout();
 					break;
 				case AJOUTER_EQUIPE:
+					if(client.getRole()!=Permission.ECURIE) {
+						errorPermission();
+						break;
+					}
+					
 					break;
 				case AJOUTER_TOURNOI:
 					break;
@@ -95,22 +100,24 @@ public class ListenClient implements Runnable{
 	
 	private void errorPermission() {
 		ResponseObject r = new ResponseObject(Response.ERROR_PERMISSION, null, null);
-		send(r);
+		client.send(r);
+	}
+	
+	private void ErrorLogin() {
+		ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
+		client.send(r);
 	}
 	
 	private void login(Command c) {
 		Login l = (Login) c.getInfoByID(InfoID.login);
 		int result = client.login(l.getUsername(), l.getPassword());
 		if (result == -1) {
-			ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
-			send(r);
+			ErrorLogin();
 		} else {
 			try {
 				Result res = DatabaseAccess.getInstance().getData(new Requete(Requete.getUserByID(result), typeRequete.REQUETE));
 				if (res.isError()) {
-					System.out.println("Erreur :"+res.isError());
-					ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
-					send(r);
+					ErrorLogin();
 				}
 				ResultSet rs = res.getResultSet();
 				rs.next();
@@ -135,25 +142,15 @@ public class ListenClient implements Runnable{
 				
 				}
 				ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
-				send(r);
+				client.send(r);
 				client.setIsLogin(true);
 			} catch (Exception e) {
 				e.printStackTrace();
-				ResponseObject r = new ResponseObject(Response.ERROR_LOGIN, null, null);
-				send(r);
+				ErrorLogin();
 			}
 
 			
 			
-			
-		}
-	}
-	
-	public void send(ResponseObject o) {
-		ObjectOutputStream out = client.getOut();
-		try {
-			out.writeObject(o);
-		} catch (IOException e) {
 			
 		}
 	}
