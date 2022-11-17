@@ -1,6 +1,8 @@
 package data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import types.ClassementInfo;
@@ -14,10 +16,38 @@ public class Data implements Serializable, Infos {
 	 * 
 	 */
 	private static final long serialVersionUID = 6632461413087395187L;
-	private HashMap<Integer, EcurieInfo> ecuries;
-	private HashMap<Integer, TournoiInfo> calendrier;
-	private HashMap<Integer, ClassementInfo> classements;
+	private static HashMap<Integer, EcurieInfo> ecuries;
+	private static HashMap<Integer, TournoiInfo> calendrier;
+	private static HashMap<Integer, ClassementInfo> classements;
 	
-
+	public static HashMap<Integer, TournoiInfo> getCalendrier() {
+		return calendrier;
+	}
+	
+	public static HashMap<Integer, ClassementInfo> getClassements() {
+		return classements;
+	}
+	
+	public static HashMap<Integer, EcurieInfo> getEcuries() {
+		return ecuries;
+	}
+	
+	public static void setCalendrier(HashMap<Integer, TournoiInfo> calendrier) {
+		Data.calendrier = calendrier;
+	}
+	
+	public static void setClassements(HashMap<Integer, ClassementInfo> classements) {
+		Data.classements = classements;
+	}
+	
+	public static void setEcuries(HashMap<Integer, EcurieInfo> ecuries) {
+		Data.ecuries = ecuries;
+	}
+	
+	public static ArrayList<EcurieInfo> getListEcurie() {
+		Collection<EcurieInfo> values = ecuries.values();
+		ArrayList<EcurieInfo> listOfValues = new ArrayList<>(values);
+		return listOfValues;
+	}
 	
 }

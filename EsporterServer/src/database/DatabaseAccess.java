@@ -169,9 +169,9 @@ public class DatabaseAccess {
 		return data.getValue();
 	}
 	
-	public EcurieInfo getEcurie() throws InterruptedException {
+	public EcurieInfo getEcurie(Requete requete) throws InterruptedException {
 		EcurieInfo ecurie = new EcurieInfo(null, null, null, 0);
-		int id = in.put(null /*Requete Get  * ecurie*/);
+		int id = in.put(requete);
 		Entry<Integer, Result> data;
 		data = out.get(id);
 		return ecurie;

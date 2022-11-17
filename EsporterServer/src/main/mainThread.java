@@ -2,15 +2,23 @@ package main;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
+import data.Data;
 import database.DatabaseAccess;
+import database.Requete;
+import database.Requete.typeRequete;
 import socket.Response;
 import socket.ResponseObject;
+import types.EcurieInfo;
+import types.EquipeInfo;
 import types.InfoID;
 import types.Infos;
+import types.Jeu;
+import types.JoueurInfo;
 
 public class mainThread {
 
@@ -63,7 +71,24 @@ public class mainThread {
 		nbClient++;
 	}
 	
-	public void initializeApp() {
+	public void initializeApp() throws InterruptedException, SQLException {
+		Requete r = new Requete(Requete.allEcurie(), typeRequete.REQUETE);
+		ResultSet rs = db.getData(r).getResultSet();
+		HashMap<Integer, EcurieInfo> ecuries = new HashMap<>();
+		while(rs.next()) {
+			ecuries.put(rs.getInt("id_utilisateur"), new EcurieInfo(rs.getString("nomEcurie"), rs.getBlob("logoEcurie"), rs.getString("DiminutifEcurie"), rs.getInt("id_utilisateur")));
+		}
+		Data.setEcuries(ecuries);
+		EquipeInfo equipe;
+		JoueurInfo joueur;
+		for (EcurieInfo ec : Data.getListEcurie()) {
+			r = new Requete(Requete.allEquipeByEcurie(ec.getId()), typeRequete.REQUETE);
+			rs = db.getData(r).getResultSet();
+			while(rs.next()) {
+				equipe = new EquipeInfo(Jeu.intToJeu(rs.getInt("Id_Jeux")), ec , null, rs.getInt("Id_Equipe"));
+				ec.ajouterEquipe(equipe);
+			}
+		}
 		//Ecurie
 			//Equipe
 				//Joueur

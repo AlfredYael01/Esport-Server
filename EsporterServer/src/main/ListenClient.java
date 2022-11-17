@@ -93,6 +93,11 @@ public class ListenClient implements Runnable{
 		}
 	}
 	
+	private void ajouterEquipe() {
+		
+	}
+	
+	
 	private void logout() {
 		client.setIsLogin(false);
 		client.setPermission(Permission.VISITEUR);
