@@ -36,33 +36,34 @@ public class Requete {
 	}
 	
 	public static String VoirInfosEcurie(int id) {
-		return "Select NomEcurie, LogoEcurie, DiminutifEcurie from Utilisateurs WHERE	Id_Utilisateur 	=	"+ id;
+		return "Select NomEcurie, LogoEcurie, DiminutifEcurie from cmf4263a.Utilisateur WHERE	Id_Utilisateur 	=	"+ id;
 	}
 	
 	public static String allEcurie() {
-		return "Select Id_Utilisateur, NomEcurie, LogoEcurie, DiminutifEcurie from Utilisateurs where id_role=4";
+		return "Select Id_Utilisateur, NomEcurie, LogoEcurie, DiminutifEcurie from cmf4263a.Utilisateur where id_role=4";
 	}
 	
 	public static String allJoueurByEquipe(int id) {
-		return "select nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, u.id_equipe, id_nationalite from Utilisateur u, Equipe e where "+id+" = e.id_Utilisateur and e.id_equipe = u.id_equipe and id_role = 3";
+		return "select nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, u.id_equipe, id_nationalite from cmf4263a.Utilisateur u, cmf4263a.Equipe e where "+id+" = e.id_Utilisateur and e.id_equipe = u.id_equipe and id_role = 3";
 	}
 	
 	public static String allEquipeByEcurie(int id) {
-		return "select e.id_equipe, id_jeux, e.id_utilisateur from Equipe e where "+id+" = e.id_Utilisateur";
+		return "select e.id_equipe, id_jeux, e.id_utilisateur from cmf4263a.Equipe e where "+id+" = e.id_Utilisateur";
 	}
 	
 	public static String ajouterEcurie(String  username, String password, String NomEcurie, String DiminutifEcurie, Blob LogoEcurie) {
-		return "{? = CALL registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
+		return "{? = CALL cmf4263a.registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
 
 	}
 	public static String AjouterJoueur(String username,  String password , String NomJoueur, String PrenomJoueur, Blob PhotoJoueur, Date DateNaissanceJoueur, Date DateContratJoueur, Date FinContratJoueur, int Id_Equipe, int Id_Nationalite) {
-		return "{? = CALL registerJoueur("+ username + ","+ password+","+NomJoueur+ ","+PrenomJoueur+","+PhotoJoueur+","+ DateNaissanceJoueur + ","+ DateContratJoueur + "," + FinContratJoueur +","+Id_Equipe+","+Id_Nationalite+")}";
+		return "{? = CALL cmf4263a.registerJoueur("+ username + ","+ password+","+NomJoueur+ ","+PrenomJoueur+","+PhotoJoueur+","+ DateNaissanceJoueur + ","+ DateContratJoueur + "," + FinContratJoueur +","+Id_Equipe+","+Id_Nationalite+")}";
 	}
+	/*
 	public static String VoirInfosEcurie4 (int IdEquipe) {
 
 		return "Select  j.Nom as Nom_Joueur , Prenom, Photo, DateNaissance, Date_de_contrat, Fin_de_contrat, j.Nationalité as Nationalité_Joueur From Joueur j Where 	Joueur.Id_Equipe 	= 	IdEquipe;";
 
-	}
+	}*/
 	
 	
 	
