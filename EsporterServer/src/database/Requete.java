@@ -23,6 +23,10 @@ public class Requete {
 		return "select nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, nomecurie, logoecurie, diminutifecurie, id_role, id_nationalite, id_equipe from cmf4263a.utilisateur where id_utilisateur = "+id;
 	}
 	
+	public static String getCalendrier() {
+		return "select id_jeux, id_tournois, DateLimiteInscription, nom, datetournoi, renommee from cmf4263a.Tournoi";
+	}
+	
 	/*
 	public static String AjouterTournoi(Date dateLimiteInscription, String nom, Date dateTournoi,int Id_Tournois, String Renommée ) {
 		return "INSERT INTO table VALUES (	"+ dateLimiteInscription +","+ nom +","+ dateTournoi +","+ Id_Tournois +","+ Renommée +");";

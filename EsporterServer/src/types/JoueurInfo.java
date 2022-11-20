@@ -27,11 +27,12 @@ public class JoueurInfo implements Infos, Serializable {
 	private int nationalite;
 	private int id_equipe;
 	private BufferedImage photo;
+	private int id_ecurie;
 	
 	
 
 	public JoueurInfo(int id, String nom, String prenom, Blob photoBlob, Date dateNaissance, Date dateDebutContrat,
-			Date dateFinContrat, int nationalite, int id_equipe) {
+			Date dateFinContrat, int nationalite, int id_equipe, int id_ecurie) {
 		this.id = id;
 		this.nom = nom;
 		this.prenom = prenom;
@@ -41,6 +42,7 @@ public class JoueurInfo implements Infos, Serializable {
 		this.dateFinContrat = dateFinContrat;
 		this.nationalite = nationalite;
 		this.id_equipe = id_equipe;
+		this.id_ecurie = id_ecurie;
 		
 		/*
 		try {
@@ -56,6 +58,11 @@ public class JoueurInfo implements Infos, Serializable {
 	public int getId_equipe() {
 		return id_equipe;
 	}
+	
+	public int getId_ecurie() {
+		return id_ecurie;
+	}
+	
 
 
 

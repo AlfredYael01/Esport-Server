@@ -16,36 +16,37 @@ public class Data implements Serializable, Infos {
 	 * 
 	 */
 	private static final long serialVersionUID = 6632461413087395187L;
-	private static HashMap<Integer, EcurieInfo> ecuries;
-	private static HashMap<Integer, TournoiInfo> calendrier;
-	private static HashMap<Integer, ClassementInfo> classements;
+	private volatile HashMap<Integer, EcurieInfo> ecuries;
+	private volatile HashMap<Integer, TournoiInfo> calendrier;
+	private volatile HashMap<Integer, ClassementInfo> classements;
 	
-	public static HashMap<Integer, TournoiInfo> getCalendrier() {
+	public HashMap<Integer, TournoiInfo> getCalendrier() {
 		return calendrier;
 	}
 	
-	public static HashMap<Integer, ClassementInfo> getClassements() {
+	public HashMap<Integer, ClassementInfo> getClassements() {
 		return classements;
 	}
 	
-	public static HashMap<Integer, EcurieInfo> getEcuries() {
+	public HashMap<Integer, EcurieInfo> getEcuries() {
 		return ecuries;
 	}
 	
-	public static void setCalendrier(HashMap<Integer, TournoiInfo> calendrier) {
-		Data.calendrier = calendrier;
+	
+	public void setCalendrier(HashMap<Integer, TournoiInfo> calendrier) {
+		this.calendrier = calendrier;
 	}
 	
-	public static void setClassements(HashMap<Integer, ClassementInfo> classements) {
-		Data.classements = classements;
+	public void setClassements(HashMap<Integer, ClassementInfo> classements) {
+		this.classements = classements;
 	}
 	
-	public static void setEcuries(HashMap<Integer, EcurieInfo> ecuries) {
-		Data.ecuries = ecuries;
+	public void setEcuries(HashMap<Integer, EcurieInfo> ecuries) {
+		this.ecuries = ecuries;
 	}
 	
-	public static ArrayList<EcurieInfo> getListEcurie() {
-		Collection<EcurieInfo> values = ecuries.values();
+	public ArrayList<EcurieInfo> getListEcurie() {
+		Collection<EcurieInfo> values = this.ecuries.values();
 		ArrayList<EcurieInfo> listOfValues = new ArrayList<>(values);
 		return listOfValues;
 	}
