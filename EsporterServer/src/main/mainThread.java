@@ -79,6 +79,10 @@ public class mainThread {
 		nbClient++;
 	}
 	
+	public synchronized Data getData() {
+		return data;
+	}
+	
 	public void initializeApp() throws InterruptedException, SQLException {
 		//ECURIE
 		Requete r = new Requete(Requete.allEcurie(), typeRequete.REQUETE);
@@ -119,13 +123,14 @@ public class mainThread {
 		while(rs.next()) {
 			calendrier.put(rs.getInt("id_tournois"), new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois")));
 		}
+		this.data.setCalendrier(calendrier);
 			//Poule
 				//Rencontre
 		//Classement
 	}
 	
 	
-	public void miseAJourData(InfoID info, Infos data) {
+	public synchronized void miseAJourData(InfoID info, Infos data) {
 		ResponseObject r;
 		HashMap<InfoID, Infos> m = new HashMap<>();
 		m.put(info, data);

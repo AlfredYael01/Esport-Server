@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Timer;
 
+import data.Data;
 import database.DatabaseAccess;
 import database.Requete;
 import database.Requete.typeRequete;
@@ -86,6 +87,13 @@ public class ListenClient implements Runnable{
 				case VOIR_CALENDRIER:
 					break;
 				case VOIR_ECURIE:
+					break;
+				case INIT:
+					Data d = mainThread.getInstance().getData();
+					HashMap<InfoID,Infos> m = new HashMap<>();
+					m.put(InfoID.all, d);
+					ResponseObject r = new ResponseObject(Response.UPDATE_ALL, m, null);
+					client.send(r);
 					break;
 				default:
 					errorPermission();
