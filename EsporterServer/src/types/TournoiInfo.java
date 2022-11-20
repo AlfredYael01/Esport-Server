@@ -29,6 +29,11 @@ public class TournoiInfo implements Infos, Serializable {
 		this.jeux = jeux;
 		this.id = id;
 	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 
 	public Date getDateInscription() {
 		return dateInscription;

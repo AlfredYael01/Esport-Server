@@ -1,5 +1,6 @@
 	package main;
 
+import java.awt.Window.Type;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -11,7 +12,9 @@ import database.Requete;
 import database.Requete.typeRequete;
 import database.Result;
 import socket.ResponseObject;
+import types.InfoID;
 import types.Permission;
+import types.TournoiInfo;
 
 public class ConnectionClient {
 
@@ -56,6 +59,24 @@ public class ConnectionClient {
 		if (username.equals("test") && password.equals("mdpTest"))
 			return 4;
 		return -1;*/
+	}
+	
+	public int ajouterTournoi(TournoiInfo t) {
+		Requete req = new Requete(Requete.ajouterTournoi(t.getJeux().ordinal(), t.getDateInscription(), t.getNom(), t.getRenomme().ordinal()), typeRequete.INSERT);
+		try {
+			Result r = DatabaseAccess.getInstance().insertData(req);
+			int id = r.getEntier();
+			t.setId(id);
+			main.miseAJourData(InfoID.Tournoi, t);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+		return 1;
 	}
 	
 	

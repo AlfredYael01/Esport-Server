@@ -23,6 +23,7 @@ import types.Infos;
 import types.JoueurInfo;
 import types.Login;
 import types.Permission;
+import types.TournoiInfo;
 
 public class ListenClient implements Runnable{
 	
@@ -68,6 +69,7 @@ public class ListenClient implements Runnable{
 					
 					break;
 				case AJOUTER_TOURNOI:
+					client.ajouterTournoi((TournoiInfo)c.getInfoByID(InfoID.Tournoi));
 					break;
 				case INSCRIPTION_TOURNOI:
 					break;
@@ -101,7 +103,7 @@ public class ListenClient implements Runnable{
 		}
 	}
 	
-	private void ajouterEquipe() {
+	private void ajouterEquipe(TournoiInfo tournoi) {
 		
 	}
 	

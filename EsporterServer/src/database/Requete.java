@@ -24,7 +24,7 @@ public class Requete {
 	}
 	
 	public static String getCalendrier() {
-		return "select id_jeux, id_tournois, DateLimiteInscription, nom, datetournoi, renommee from cmf4263a.Tournoi";
+		return "select id_jeux, id_tournois, DateLimiteInscription, nom, renommee from cmf4263a.Tournoi";
 	}
 	
 	/*
@@ -34,6 +34,10 @@ public class Requete {
 	public static String AjouterEquipe (int Id_Jeux, int Id_Ecurie ) {
 		return "{? = call cmf4263a.insertEquipe("+Id_Jeux +","+ Id_Ecurie+")}";
 	}	
+	
+	public static String ajouterTournoi (int id_jeux, Date datelimite, String nom, int renommee) {
+		return String.format("{? = call cmf4263a.inserttournoi(%d,"+datelimite+",%s,%d)}", id_jeux, nom, renommee);
+	}
 	
 	public static String InscriptionTournoi(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
 		return "{Call cmf4263a.InscriptionTournoi ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";

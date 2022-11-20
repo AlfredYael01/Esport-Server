@@ -150,16 +150,16 @@ public class DatabaseAccess {
 		return data.getValue();
 	}
 	
-	public void insertData(Requete requete) throws InterruptedException {
+	public Result insertData(Requete requete) throws InterruptedException {
 		int id = in.put(requete);
+		Entry<Integer, Result> data;
+		data = out.get(id);
 		
+		return data.getValue();
 		
 	}
 	
-	public void insertTournoi(Requete requete) throws InterruptedException {
-		insertData(requete);
-		mainThread.getInstance().sendAll(null);
-	}
+
 	
 	public Result login(Requete requete) throws InterruptedException {
 		int id = in.put(requete);
