@@ -28,6 +28,8 @@ public class TournoiInfo implements Infos, Serializable {
 		this.renomme = renomme;
 		this.jeux = jeux;
 		this.id = id;
+		this.inscris = new ArrayList<>();
+		this.poule = new ArrayList<>();
 	}
 	
 	public void setId(int id) {
