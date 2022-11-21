@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 
@@ -18,11 +19,14 @@ import socket.CommandName;
 import socket.Response;
 import socket.ResponseObject;
 import types.EcurieInfo;
+import types.Entier;
 import types.InfoID;
 import types.Infos;
+import types.Jeu;
 import types.JoueurInfo;
 import types.Login;
 import types.Permission;
+import types.Renomme;
 import types.TournoiInfo;
 
 public class ListenClient implements Runnable{
@@ -72,6 +76,7 @@ public class ListenClient implements Runnable{
 					client.ajouterTournoi((TournoiInfo)c.getInfoByID(InfoID.Tournoi));
 					break;
 				case INSCRIPTION_TOURNOI:
+					inscriptionTournoi(((Entier)c.getInfoByID(InfoID.Tournoi)).getEntier(), ((Entier)c.getInfoByID(InfoID.Joueur)).getEntier());
 					break;
 				case VOIR_CALENDRIER:
 					
@@ -105,6 +110,47 @@ public class ListenClient implements Runnable{
 	
 	private void ajouterEquipe(TournoiInfo tournoi) {
 		
+	}
+	
+	private void inscriptionTournoi(int id_Tournoi, int id_Joueur) {
+		
+		try {
+			Requete r = new Requete(Requete.getEquipeByJoueur(id_Joueur),typeRequete.REQUETE);
+			Result res = DatabaseAccess.getInstance().getData(r);
+			res.getResultSet().next();
+			int id_equipe = res.getResultSet().getInt("id_equipe");
+			
+			r = new Requete(Requete.getJeux(id_Tournoi), typeRequete.REQUETE);
+			res = DatabaseAccess.getInstance().getData(r);
+			res.getResultSet().next();
+			int id_jeux = res.getResultSet().getInt("id_jeux");
+			
+			r = new Requete(Requete.InscriptionTournoi(id_jeux, id_Tournoi, id_equipe), typeRequete.INSERT);
+			res = DatabaseAccess.getInstance().getData(r);
+			
+			TournoiInfo tournoi;
+			r = new Requete(Requete.getTournoiByID(id_Tournoi), typeRequete.REQUETE);
+			res = DatabaseAccess.getInstance().getData(r);
+			ResultSet rs = res.getResultSet();
+			rs.next();
+			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			
+			r = new Requete(Requete.getInscris(id_Tournoi), typeRequete.REQUETE);
+			res = DatabaseAccess.getInstance().getData(r);
+			rs = res.getResultSet();
+			ArrayList<Integer> inscrits = new ArrayList<>();
+			while (rs.next()) {
+				inscrits.add(rs.getInt("id_equipe"));
+			}
+			tournoi.setInscris(inscrits);
+			
+			//Il manque le get Poule
+			
+			mainThread.getInstance().miseAJourData(InfoID.Tournoi, tournoi);
+			
+		} catch (InterruptedException | SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -148,7 +194,11 @@ public class ListenClient implements Runnable{
 					break;
 				case 3:
 					m.put(InfoID.Permission, Permission.JOUEUR);
-					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"), rs.getBlob("photojoueur"), rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), -1));
+					Result r = DatabaseAccess.getInstance().getData(new Requete(Requete.getEquipeByJoueur(result), typeRequete.REQUETE));
+					ResultSet resultset = r.getResultSet();
+					resultset.next();
+					
+					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"), rs.getBlob("photojoueur"), rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
 					break;
 				case 4:
 					m.put(InfoID.Permission, Permission.ECURIE);

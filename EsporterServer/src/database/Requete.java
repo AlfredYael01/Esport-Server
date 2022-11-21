@@ -27,6 +27,21 @@ public class Requete {
 		return "select id_jeux, id_tournois, DateLimiteInscription, nom, renommee from cmf4263a.Tournoi";
 	}
 	
+	public static String getInscris(int id_tournoi) {
+		return "select id_equipe from cmf4263a.Participer where id_tournois = "+id_tournoi;
+	}
+	
+	
+	
+	public static String getTournoiByID(int id) {
+		return "select id_jeux, id_tournois, DateLimiteInscription, nom, renommee from cmf4263a.Tournoi where id_tournois = "+id;
+	}
+	
+	
+	public static String getEquipeByJoueur(int id) {
+		return "select id_equipe from cmf4263a.Utilisateur where Utilisateur.Id_Utilisateur = "+id;
+	}
+	
 	/*
 	public static String AjouterTournoi(Date dateLimiteInscription, String nom, Date dateTournoi,int Id_Tournois, String Renommée ) {
 		return "INSERT INTO table VALUES (	"+ dateLimiteInscription +","+ nom +","+ dateTournoi +","+ Id_Tournois +","+ Renommée +");";
@@ -34,6 +49,10 @@ public class Requete {
 	public static String AjouterEquipe (int Id_Jeux, int Id_Ecurie ) {
 		return "{? = call cmf4263a.insertEquipe("+Id_Jeux +","+ Id_Ecurie+")}";
 	}	
+	
+	public static String getJeux (int id_tournoi) {
+		return "select id_jeux from cmf4263a.Tournoi where id_tournois ="+id_tournoi;
+	}
 	
 	public static String ajouterTournoi (int id_jeux, Date datelimite, String nom, int renommee) {
 		return String.format("{? = call cmf4263a.inserttournoi(%d,"+datelimite+",%s,%d)}", id_jeux, nom, renommee);

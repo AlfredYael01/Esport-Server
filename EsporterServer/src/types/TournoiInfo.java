@@ -20,7 +20,7 @@ public class TournoiInfo implements Infos, Serializable {
 	private Jeu jeux;
 	private int id;
 	private ArrayList<Poule> poule;
-	private ArrayList<EquipeInfo> inscris;
+	private ArrayList<Integer> inscris;
 	
 	public TournoiInfo(Date dateInscription, String nom, Renomme renomme, Jeu jeux, int id) {
 		this.dateInscription = dateInscription;
@@ -74,7 +74,7 @@ public class TournoiInfo implements Infos, Serializable {
 		return id == other.id;
 	}
 	
-	public ArrayList<EquipeInfo> getInscris() {
+	public ArrayList<Integer> getInscris() {
 		return inscris;
 	}
 	
@@ -82,6 +82,9 @@ public class TournoiInfo implements Infos, Serializable {
 		return poule;
 	}
 	
+	public void setInscris(ArrayList<Integer> inscris) {
+		this.inscris = inscris;
+	}
 	
 	
 	
