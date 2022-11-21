@@ -96,11 +96,13 @@ public class ListenClient implements Runnable{
 				case VOIR_ECURIE:
 					break;
 				case INIT:
+					
 					Data d = mainThread.getInstance().getData();
 					HashMap<InfoID,Infos> m = new HashMap<>();
 					m.put(InfoID.all, d);
 					ResponseObject r = new ResponseObject(Response.UPDATE_ALL, m, null);
 					client.send(r);
+					System.out.println("Send init");
 					break;
 				default:
 					errorPermission();
@@ -115,18 +117,24 @@ public class ListenClient implements Runnable{
 	private void inscriptionTournoi(int id_Tournoi, int id_Joueur) {
 		
 		try {
+			//Recuperer equipe
 			Requete r = new Requete(Requete.getEquipeByJoueur(id_Joueur),typeRequete.REQUETE);
 			Result res = DatabaseAccess.getInstance().getData(r);
 			res.getResultSet().next();
 			int id_equipe = res.getResultSet().getInt("id_equipe");
 			
+			//Recuperer jeux
 			r = new Requete(Requete.getJeux(id_Tournoi), typeRequete.REQUETE);
 			res = DatabaseAccess.getInstance().getData(r);
 			res.getResultSet().next();
 			int id_jeux = res.getResultSet().getInt("id_jeux");
 			
-			r = new Requete(Requete.InscriptionTournoi(id_jeux, id_Tournoi, id_equipe), typeRequete.INSERT);
+			r = new Requete(Requete.InscriptionTournoi(id_jeux, id_Tournoi, id_equipe), typeRequete.PROCEDURE);
 			res = DatabaseAccess.getInstance().getData(r);
+			if (res.isError()) {
+				error("Vous etes deja inscrit");
+				return;
+			}
 			
 			TournoiInfo tournoi;
 			r = new Requete(Requete.getTournoiByID(id_Tournoi), typeRequete.REQUETE);
@@ -149,7 +157,7 @@ public class ListenClient implements Runnable{
 			mainThread.getInstance().miseAJourData(InfoID.Tournoi, tournoi);
 			
 		} catch (InterruptedException | SQLException e) {
-			e.printStackTrace();
+			error("Vous etes deja inscrit");
 		}
 	}
 	
@@ -161,6 +169,11 @@ public class ListenClient implements Runnable{
 	
 	private void errorPermission() {
 		ResponseObject r = new ResponseObject(Response.ERROR_PERMISSION, null, null);
+		client.send(r);
+	}
+	
+	private void error(String s) {
+		ResponseObject r = new ResponseObject(Response.Error, null, s);
 		client.send(r);
 	}
 	

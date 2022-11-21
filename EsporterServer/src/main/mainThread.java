@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -20,6 +21,7 @@ import types.Infos;
 import types.Jeu;
 import types.JoueurInfo;
 import types.Renomme;
+import types.Titre;
 import types.TournoiInfo;
 
 public class mainThread {
@@ -40,7 +42,7 @@ public class mainThread {
 			System.out.println("Serv démarré");
 			while(running) {
 				System.out.println("En attente d'une connexion");
-				new ConnectionClient(server.accept());
+				ajouterClient(new ConnectionClient(server.accept()));
 				System.out.println("Nouvelle connexion accepté");
 			}
 			for (ConnectionClient c : tabClient) {
@@ -98,6 +100,7 @@ public class mainThread {
 		ResultSet resultJoueur;
 		Requete requeteGetJoueur;
 		HashMap<Integer,JoueurInfo> joueurs;
+		ArrayList<Titre> palmares;
 		for (EcurieInfo ec : data.getListEcurie()) {
 			r = new Requete(Requete.allEquipeByEcurie(ec.getId()), typeRequete.REQUETE);
 			rs = db.getData(r).getResultSet();
@@ -112,6 +115,18 @@ public class mainThread {
 				equipe = new EquipeInfo(Jeu.intToJeu(rs.getInt("Id_Jeux")), ec , joueurs, rs.getInt("Id_Equipe"));
 				ec.ajouterEquipe(equipe);
 			}
+			
+			r = new Requete(Requete.getTitreBuEcurie(ec.getId()), typeRequete.REQUETE);
+			rs = db.getData(r).getResultSet();
+			palmares = new ArrayList<>();
+			while(rs.next()) {
+				//Titre
+				palmares.add(new Titre(rs.getString("libelle"),rs.getDate("dateobtention")));
+				
+			}
+			ec.setPalmares(palmares);
+			
+			
 		}
 		
 		
@@ -120,8 +135,20 @@ public class mainThread {
 		r = new Requete(Requete.getCalendrier(), typeRequete.REQUETE);
 		rs = db.getData(r).getResultSet();
 		HashMap<Integer, TournoiInfo> calendrier = new HashMap<>();
+		TournoiInfo tournoi;
+		Requete req;
+		ResultSet res;
+		ArrayList<Integer> inscrits;
 		while(rs.next()) {
-			calendrier.put(rs.getInt("id_tournois"), new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois")));
+			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			req = new Requete(Requete.getInscris(tournoi.getId()), typeRequete.REQUETE);
+			res = DatabaseAccess.getInstance().getData(req).getResultSet();
+			inscrits = new ArrayList<>();
+			while (res.next()) {
+				inscrits.add(res.getInt("id_equipe"));
+			}
+			tournoi.setInscris(inscrits);
+			calendrier.put(rs.getInt("id_tournois"), tournoi);
 		}
 		this.data.setCalendrier(calendrier);
 			//Poule
@@ -131,6 +158,7 @@ public class mainThread {
 	
 	
 	public synchronized void miseAJourData(InfoID info, Infos data) {
+		System.out.println("MISE A JOUR DES DATA");
 		ResponseObject r;
 		HashMap<InfoID, Infos> m = new HashMap<>();
 		m.put(info, data);

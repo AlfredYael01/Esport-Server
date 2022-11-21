@@ -36,6 +36,10 @@ public class EcurieInfo implements Infos, Serializable {
 		return nom;
 	}
 
+	public void setPalmares(ArrayList<Titre> palmares) {
+		this.palmares = palmares;
+	}
+	
 	public Blob getLogo() {
 		return logo;
 	}

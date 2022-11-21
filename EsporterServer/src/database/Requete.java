@@ -59,7 +59,11 @@ public class Requete {
 	}
 	
 	public static String InscriptionTournoi(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
-		return "{Call cmf4263a.InscriptionTournoi ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";
+		return "{Call cmf4263a.INSCRIPTIONTOURNOI ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";
+	}
+	
+	public static String getTitreBuEcurie(int id) {
+		return "select libelle, dateobtention from cmf4263a.Titre, cmf4263a.Gagner where Titre.id_titre = Gagner.id_Titre and Gagner.id_Utilisateur = "+id;
 	}
 	
 	public static String VoirInfosEcurie(int id) {
