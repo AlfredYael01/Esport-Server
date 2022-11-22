@@ -20,7 +20,6 @@ public class ConnectionClient {
 
 	
 	private Thread thread;
-	private mainThread main = mainThread.getInstance();
 	private Socket s;
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
@@ -36,6 +35,7 @@ public class ConnectionClient {
 			
 		}
 		thread = new Thread(new ListenClient(this));
+		thread.setDaemon(true);
 		thread.start();
 	}
 	
@@ -67,7 +67,7 @@ public class ConnectionClient {
 			Result r = DatabaseAccess.getInstance().insertData(req);
 			int id = r.getEntier();
 			t.setId(id);
-			main.miseAJourData(InfoID.Tournoi, t);
+			mainThread.getInstance().miseAJourData(InfoID.Tournoi, t);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,7 +101,7 @@ public class ConnectionClient {
 		try {
 			out.writeObject(o);
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		}
 	}
 	

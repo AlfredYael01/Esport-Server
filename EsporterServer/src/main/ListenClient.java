@@ -32,7 +32,7 @@ import types.TournoiInfo;
 public class ListenClient implements Runnable{
 	
 	private ConnectionClient client;
-	
+	public Boolean run = true;
 	public ListenClient(ConnectionClient client) {
 		this.client = client;
 	}
@@ -40,10 +40,11 @@ public class ListenClient implements Runnable{
 	@Override
 	public void run() {
 		ObjectInputStream in = client.getIn();
-		while (true) {
+		while (run) {
 			try {
 				Object o = in.readObject();
 				commande(o);
+				
 			} catch (ClassNotFoundException e) {
 			} catch (IOException e) {
 				System.out.println("fin d'un thread");

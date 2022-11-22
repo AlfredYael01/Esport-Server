@@ -119,6 +119,7 @@ public class DatabaseAccess {
 				}
 			}
 		});
+		t.setDaemon(true);
 		t.start();
 		
 	}

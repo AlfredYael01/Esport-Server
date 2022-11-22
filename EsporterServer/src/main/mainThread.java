@@ -2,6 +2,7 @@ package main;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ public class mainThread {
 
 	private static mainThread instance;
 	private boolean running=true;
-	private Vector<ConnectionClient> tabClient=new Vector<>();
-	private int nbClient=0;
+	private static volatile ArrayList<ConnectionClient> tabClient =  new ArrayList<>();
+	private static volatile int nbClient=0;
 	private DatabaseAccess db;
 	private Data data;
 	
@@ -42,7 +43,10 @@ public class mainThread {
 			System.out.println("Serv démarré");
 			while(running) {
 				System.out.println("En attente d'une connexion");
-				ajouterClient(new ConnectionClient(server.accept()));
+				Socket s = server.accept();
+				ConnectionClient c = new ConnectionClient(s);
+				ajouterClient(c);
+
 				System.out.println("Nouvelle connexion accepté");
 			}
 			for (ConnectionClient c : tabClient) {
@@ -77,8 +81,10 @@ public class mainThread {
 	}
 	
 	public void ajouterClient(ConnectionClient c) {
-		tabClient.add(c);
-		nbClient++;
+		synchronized (tabClient) {
+			tabClient.add(c);
+			nbClient++;
+		}
 	}
 	
 	public synchronized Data getData() {
@@ -173,6 +179,7 @@ public class mainThread {
 			TournoiInfo tournoi = (TournoiInfo)data;
 			this.data.getCalendrier().put(tournoi.getId(), tournoi);
 			r = new ResponseObject(Response.UPDATE_TOURNOI, m, null);
+			System.out.println();
 			sendAll(r);
 			break;
 		case Equipe:
@@ -186,13 +193,19 @@ public class mainThread {
 	}
 	
 	public void sendAll(ResponseObject response) {
-		for (ConnectionClient con : tabClient) {
-			con.send(response);
+		synchronized (tabClient) {
+			System.out.println("Send all "+response.getName());
+			for (ConnectionClient con : tabClient) {
+				System.out.println("send");
+				con.send(response);
+			}
 		}
 	}
 	
 	public void closeClient(ConnectionClient c) {
-		tabClient.remove(c);
-		nbClient--;
+		synchronized (tabClient) {
+			tabClient.remove(c);
+			nbClient--;
+		}
 	}
 }
