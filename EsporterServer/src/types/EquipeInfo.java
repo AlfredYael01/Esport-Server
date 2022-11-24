@@ -23,6 +23,10 @@ public class EquipeInfo implements Infos, Serializable  {
 		this.id = id;
 	}
 	
+	public void setJoueurs(HashMap<Integer, JoueurInfo> joueurs) {
+		this.joueurs = joueurs;
+	}
+	
 	
 	public Jeu getJeu() {
 		return jeu;

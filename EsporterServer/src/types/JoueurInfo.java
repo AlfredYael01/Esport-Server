@@ -60,6 +60,10 @@ public class JoueurInfo implements Infos, Serializable {
 		return id_equipe;
 	}
 	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
 	public int getId_ecurie() {
 		return id_ecurie;
 	}

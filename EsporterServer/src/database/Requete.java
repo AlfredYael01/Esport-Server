@@ -82,12 +82,20 @@ public class Requete {
 		return "select e.id_equipe, id_jeux, e.id_utilisateur from cmf4263a.Equipe e where "+id+" = e.id_Utilisateur";
 	}
 	
-	public static String ajouterEcurie(String  username, String password, String NomEcurie, String DiminutifEcurie, Blob LogoEcurie) {
+	public static String ajouterEcurie(String  username, String password, String NomEcurie, String DiminutifEcurie, String LogoEcurie) {
 		return "{? = CALL cmf4263a.registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
 
 	}
-	public static String AjouterJoueur(String username,  String password , String NomJoueur, String PrenomJoueur, Blob PhotoJoueur, Date DateNaissanceJoueur, Date DateContratJoueur, Date FinContratJoueur, int Id_Equipe, int Id_Nationalite) {
+	public static String AjouterJoueur(String username,  String password , String NomJoueur, String PrenomJoueur, String PhotoJoueur, Date DateNaissanceJoueur, Date DateContratJoueur, Date FinContratJoueur, int Id_Equipe, int Id_Nationalite) {
 		return "{? = CALL cmf4263a.registerJoueur("+ username + ","+ password+","+NomJoueur+ ","+PrenomJoueur+","+PhotoJoueur+","+ DateNaissanceJoueur + ","+ DateContratJoueur + "," + FinContratJoueur +","+Id_Equipe+","+Id_Nationalite+")}";
+	}
+	
+	public static String removeJoueurByEquipe(int id) {
+		return "delete from cmf4263a.Utilisateur where id_equipe = "+id;
+	}
+	
+	public static String removeEquipe(int id) {
+		return "delete from cmf4263a.Equipe where id_equipe = "+id;
 	}
 	/*
 	public static String VoirInfosEcurie4 (int IdEquipe) {

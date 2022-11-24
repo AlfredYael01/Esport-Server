@@ -26,6 +26,7 @@ import socket.Response;
 import socket.ResponseObject;
 import types.EcurieInfo;
 import types.Entier;
+import types.EquipeInfo;
 import types.Image;
 import types.InfoID;
 import types.Infos;
@@ -33,8 +34,10 @@ import types.Jeu;
 import types.JoueurInfo;
 import types.Login;
 import types.Permission;
+import types.RegisterEquipe;
 import types.Renomme;
 import types.TournoiInfo;
+import types.registerJoueur;
 
 public class ListenClient implements Runnable{
 	
@@ -78,7 +81,8 @@ public class ListenClient implements Runnable{
 						errorPermission();
 						break;
 					}
-					
+					RegisterEquipe equipe = (RegisterEquipe) c.getInfoByID(InfoID.Equipe);
+					ajouterEquipe(equipe);
 					break;
 				case AJOUTER_TOURNOI:
 					client.ajouterTournoi((TournoiInfo)c.getInfoByID(InfoID.Tournoi));
@@ -118,7 +122,67 @@ public class ListenClient implements Runnable{
 		}
 	}
 	
-	private void ajouterEquipe(TournoiInfo tournoi) {
+	private void ajouterEquipe(RegisterEquipe equipe) {
+		Result res = null;
+		try {
+			Requete r = new Requete(Requete.AjouterEquipe(Jeu.jeuToInt(equipe.getJeu()), equipe.getIdEcurie()), typeRequete.FONCTION);
+			res = DatabaseAccess.getInstance().getData(r);
+			if (res.isError()) {
+				error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
+			}
+		} catch (InterruptedException | SQLException e) {
+			e.printStackTrace();
+			error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
+			return;
+		}
+		try {
+			
+			Requete temp = new Requete(Requete.VoirInfosEcurie(equipe.getIdEcurie()),typeRequete.REQUETE);
+			Result tempRes = DatabaseAccess.getInstance().getData(temp);
+			ResultSet rs = tempRes.getResultSet();
+			BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
+			Image im1 = new Image(bf1, "png");
+			 
+			EcurieInfo ecurie = new EcurieInfo(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), equipe.getIdEcurie());
+			
+			EquipeInfo eq = new EquipeInfo(equipe.getJeu(), ecurie, null,res.getEntier());
+			HashMap<Integer, JoueurInfo> joueurs = new HashMap<>();
+			for (registerJoueur jou : equipe.getJoueurs()) {
+				JoueurInfo joueur = jou.getJoueur();
+				Requete reqJou = new Requete(Requete.AjouterJoueur(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getNom(),joueur.getPrenom(), joueur.getPhoto().getBase64Image(), joueur.getDateNaissance(), joueur.getDateDebutContrat(), joueur.getDateFinContrat(), res.getEntier(), 1),typeRequete.FONCTION);
+				Result resJou = DatabaseAccess.getInstance().getData(reqJou);
+				if (resJou.isError()) {
+					erreurAjoutEquipe(res.getEntier());
+					error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
+					return;
+				}
+				joueur.setId(resJou.getEntier());
+				joueurs.put(resJou.getEntier(), joueur);
+			}
+			eq.setJoueurs(joueurs);
+			mainThread.getInstance().miseAJourData(InfoID.Equipe, eq);
+				
+		} catch (InterruptedException | SQLException e) {
+			erreurAjoutEquipe(res.getEntier());
+			error("Erreur dans l'ajout de cette equipe, veuillez ressayer plus tard");
+		} catch (IOException e) {
+			erreurAjoutEquipe(res.getEntier());
+			error("Erreur dans l'ajout de cette equipe, veuillez ressayer plus tard");
+		}
+	}
+	
+	private void erreurAjoutEquipe(int idEquipe) {
+		try {
+			Requete r = new Requete(Requete.removeJoueurByEquipe(idEquipe),typeRequete.REQUETE);
+			Result res = DatabaseAccess.getInstance().getData(r);
+			
+			r = new Requete(Requete.removeEquipe(idEquipe),typeRequete.REQUETE);
+			res = DatabaseAccess.getInstance().getData(r);
+		} catch (InterruptedException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 	}
 	

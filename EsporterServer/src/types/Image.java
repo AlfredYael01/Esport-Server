@@ -32,6 +32,10 @@ public class Image implements Infos, Serializable {
 		return bufferedimage;
 	}
 	
+	public String getBase64Image() {
+		return image;
+	}
+	
 	public static String imgToBase64String(final RenderedImage img, final String formatName)
 	{
 	  final ByteArrayOutputStream os = new ByteArrayOutputStream();
