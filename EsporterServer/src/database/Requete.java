@@ -1,22 +1,53 @@
 package database;
 
+import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Date;
 
+import types.registerJoueur;
+
 public class Requete {
 
-	public enum typeRequete{FONCTION, REQUETE, PROCEDURE, INSERT}
+	public enum typeRequete{FONCTION, REQUETE, PROCEDURE, INSERT, INSERTJOUEUR}
 	
 	
 	private String requete;
 	private typeRequete type;
+	private InputStream inputStream;
+	private Date[] dates = null;
+	private int[] integers = null;
 	public Requete(String requete, typeRequete type) {
 		this.requete = requete;
 		this.type = type;
 	}
 	
+	public int[] getIntegers() {
+		return integers;
+	}
+	
+	public void setIntegers(int... integers) {
+		this.integers = integers;
+	}
+	
+	
+	public void setDates(Date... dates) {
+		this.dates = dates;
+	}
+	
+	public Date[] getDates() {
+		return dates;
+	}
+	
 	public static String Login(String user, String pass) {
 		return "{? = call cmf4263a.loginapp('"+user+"', '"+pass+"')}";
+	}
+	
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+	
+	public InputStream getInputStream() {
+		return inputStream;
 	}
 	
 	public static String getUserByID(int id) {
@@ -59,7 +90,7 @@ public class Requete {
 	}
 	
 	public static String InscriptionTournoi(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
-		return "{Call cmf4263a.INSCRIPTIONTOURNOI ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";
+		return "{call cmf4263a.INSCRIPTIONTOURNOI ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";
 	}
 	
 	public static String getTitreBuEcurie(int id) {
@@ -83,11 +114,11 @@ public class Requete {
 	}
 	
 	public static String ajouterEcurie(String  username, String password, String NomEcurie, String DiminutifEcurie, String LogoEcurie) {
-		return "{? = CALL cmf4263a.registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
+		return "{? = call cmf4263a.registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
 
 	}
-	public static String AjouterJoueur(String username,  String password , String NomJoueur, String PrenomJoueur, String PhotoJoueur, Date DateNaissanceJoueur, Date DateContratJoueur, Date FinContratJoueur, int Id_Equipe, int Id_Nationalite) {
-		return "{? = CALL cmf4263a.registerJoueur("+ username + ","+ password+","+NomJoueur+ ","+PrenomJoueur+","+PhotoJoueur+","+ DateNaissanceJoueur + ","+ DateContratJoueur + "," + FinContratJoueur +","+Id_Equipe+","+Id_Nationalite+")}";
+	public static String AjouterJoueur(String username,  String password , String NomJoueur, String PrenomJoueur, int Id_Equipe, int Id_Nationalite) {
+		return "{? = call cmf4263a.registerJoueur('"+ username + "','"+ password+"','"+NomJoueur+ "','"+PrenomJoueur+"',?,?,?,?,"+Id_Nationalite+","+Id_Equipe+")}";
 	}
 	
 	public static String removeJoueurByEquipe(int id) {

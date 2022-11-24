@@ -2,6 +2,8 @@ package main;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -140,6 +142,7 @@ public class ListenClient implements Runnable{
 			Requete temp = new Requete(Requete.VoirInfosEcurie(equipe.getIdEcurie()),typeRequete.REQUETE);
 			Result tempRes = DatabaseAccess.getInstance().getData(temp);
 			ResultSet rs = tempRes.getResultSet();
+			rs.next();
 			BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
 			Image im1 = new Image(bf1, "png");
 			 
@@ -149,7 +152,12 @@ public class ListenClient implements Runnable{
 			HashMap<Integer, JoueurInfo> joueurs = new HashMap<>();
 			for (registerJoueur jou : equipe.getJoueurs()) {
 				JoueurInfo joueur = jou.getJoueur();
-				Requete reqJou = new Requete(Requete.AjouterJoueur(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getNom(),joueur.getPrenom(), joueur.getPhoto().getBase64Image(), joueur.getDateNaissance(), joueur.getDateDebutContrat(), joueur.getDateFinContrat(), res.getEntier(), 1),typeRequete.FONCTION);
+				Requete reqJou = new Requete(Requete.AjouterJoueur(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getNom(),joueur.getPrenom(), res.getEntier(), 1),typeRequete.INSERTJOUEUR);
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+	            ImageIO.write(joueur.getPhoto().getImage(), "png", os);
+	            InputStream is = new ByteArrayInputStream(os.toByteArray());
+				reqJou.setInputStream(is);
+				reqJou.setDates(joueur.getDateNaissance(), joueur.getDateDebutContrat(), joueur.getDateFinContrat());
 				Result resJou = DatabaseAccess.getInstance().getData(reqJou);
 				if (resJou.isError()) {
 					erreurAjoutEquipe(res.getEntier());

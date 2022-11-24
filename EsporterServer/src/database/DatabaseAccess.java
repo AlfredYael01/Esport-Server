@@ -53,7 +53,6 @@ public class DatabaseAccess {
 									cstmt.executeUpdate();
 									int entier = cstmt.getInt(1);
 									rs.setEntier(entier);
-									System.out.println("Entier db : "+entier);
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -110,7 +109,33 @@ public class DatabaseAccess {
 									rs.setError(true);
 								}
 								break;
-
+							case INSERTJOUEUR:
+								
+								try {
+									System.out.println(r.getRequete());
+									CallableStatement insertJoueur = conn.prepareCall(r.getRequete());
+									insertJoueur.registerOutParameter(1, Types.INTEGER);
+									insertJoueur.setBinaryStream(2, r.getInputStream());
+									int j = 3;
+									if (r.getDates()!=null) {
+										for (int i=0;i<r.getDates().length;i++) {
+											insertJoueur.setDate(i+j, r.getDates()[i]);
+										}
+										j+=r.getDates().length;
+									}
+									insertJoueur.executeUpdate();
+									int entier = insertJoueur.getInt(1);
+									rs.setEntier(entier);
+								} catch (SQLException e1) {
+									e1.printStackTrace();
+									rs.setError(true);
+								}
+								try {
+									out.put(rs, id);
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							
 							}
 							
