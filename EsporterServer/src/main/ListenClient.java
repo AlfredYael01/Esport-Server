@@ -1,6 +1,10 @@
 package main;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
@@ -8,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
+
+import javax.imageio.ImageIO;
 
 import data.Data;
 import database.DatabaseAccess;
@@ -20,6 +26,7 @@ import socket.Response;
 import socket.ResponseObject;
 import types.EcurieInfo;
 import types.Entier;
+import types.Image;
 import types.InfoID;
 import types.Infos;
 import types.Jeu;
@@ -211,12 +218,15 @@ public class ListenClient implements Runnable{
 					Result r = DatabaseAccess.getInstance().getData(new Requete(Requete.getEquipeByJoueur(result), typeRequete.REQUETE));
 					ResultSet resultset = r.getResultSet();
 					resultset.next();
-					
-					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"), rs.getBlob("photojoueur"), rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
+					BufferedImage bf = ImageIO.read(rs.getBinaryStream("photojoueur"));
+					Image im = new Image(bf, null);
+					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
 					break;
 				case 4:
 					m.put(InfoID.Permission, Permission.ECURIE);
-					m.put(InfoID.Ecurie, new EcurieInfo(rs.getString("nomecurie"), rs.getBlob("logoecurie"), rs.getString("diminutifecurie"), result));
+					BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
+					Image im1 = new Image(bf1, null);
+					m.put(InfoID.Ecurie, new EcurieInfo(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), result));
 					break;
 				
 				}

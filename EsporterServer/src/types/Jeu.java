@@ -1,6 +1,5 @@
 package types;
 
-import java.awt.Image;
 import java.io.Serializable;
 
 public enum Jeu implements Infos, Serializable {
@@ -36,8 +35,6 @@ public enum Jeu implements Infos, Serializable {
 		}
 		return Jeu.values()[i];
 	}
-	
-	
 	
 	
 

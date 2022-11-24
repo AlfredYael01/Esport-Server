@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
+
 import data.Data;
 import database.DatabaseAccess;
 import database.Requete;
@@ -17,6 +20,7 @@ import socket.Response;
 import socket.ResponseObject;
 import types.EcurieInfo;
 import types.EquipeInfo;
+import types.Image;
 import types.InfoID;
 import types.Infos;
 import types.Jeu;
@@ -91,13 +95,15 @@ public class mainThread {
 		return data;
 	}
 	
-	public void initializeApp() throws InterruptedException, SQLException {
+	public void initializeApp() throws InterruptedException, SQLException, IOException {
 		//ECURIE
 		Requete r = new Requete(Requete.allEcurie(), typeRequete.REQUETE);
 		ResultSet rs = db.getData(r).getResultSet();
 		HashMap<Integer, EcurieInfo> ecuries = new HashMap<>();
 		while(rs.next()) {
-			ecuries.put(rs.getInt("id_utilisateur"), new EcurieInfo(rs.getString("nomEcurie"), rs.getBlob("logoEcurie"), rs.getString("DiminutifEcurie"), rs.getInt("id_utilisateur")));
+			BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
+			Image im1 = new Image(bf1, "png");
+			ecuries.put(rs.getInt("id_utilisateur"), new EcurieInfo(rs.getString("nomEcurie"), im1, rs.getString("DiminutifEcurie"), rs.getInt("id_utilisateur")));
 		}
 		data.setEcuries(ecuries);
 		//EQUIPE
@@ -116,7 +122,9 @@ public class mainThread {
 				requeteGetJoueur = new Requete(Requete.allJoueurByEquipe(rs.getInt("Id_Equipe")), typeRequete.REQUETE);
 				resultJoueur = db.getData(requeteGetJoueur).getResultSet();
 				while(resultJoueur.next()) {
-					joueurs.put(resultJoueur.getInt("Id_Utilisateur"), new JoueurInfo(resultJoueur.getInt("Id_Utilisateur"), rs.getString("nomjoueur"), rs.getString("prenomjoueur"), rs.getBlob("photojoueur"), rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), ec.getId()));
+					BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("photojoueur"));
+					Image im1 = new Image(bf1, "png");
+					joueurs.put(resultJoueur.getInt("Id_Utilisateur"), new JoueurInfo(resultJoueur.getInt("Id_Utilisateur"), rs.getString("nomjoueur"), rs.getString("prenomjoueur"), im1, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), ec.getId()));
 				}
 				equipe = new EquipeInfo(Jeu.intToJeu(rs.getInt("Id_Jeux")), ec , joueurs, rs.getInt("Id_Equipe"));
 				ec.ajouterEquipe(equipe);
