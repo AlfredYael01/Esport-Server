@@ -27,7 +27,6 @@ public class JoueurInfo implements Infos, Serializable {
 	private Date dateFinContrat;
 	private int nationalite;
 	private int id_equipe;
-	private BufferedImage photo;
 	private int id_ecurie;
 	
 	
@@ -45,15 +44,7 @@ public class JoueurInfo implements Infos, Serializable {
 		this.id_equipe = id_equipe;
 		this.id_ecurie = id_ecurie;
 		
-		/*
-		try {
-			this.photo = ImageIO.read(photoBlob.getBinaryStream());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}*/
-		this.photo=null;
+
 	}
 	
 	public int getId_equipe() {
@@ -93,9 +84,6 @@ public class JoueurInfo implements Infos, Serializable {
 		return image;
 	}
 	
-	public BufferedImage getPhotoTraite() {
-		return photo;
-	}
 
 
 
