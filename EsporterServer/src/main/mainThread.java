@@ -68,12 +68,12 @@ public class mainThread {
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (SQLException e1) {
-			e1.printStackTrace();
+			//e1.printStackTrace();
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
-			e2.printStackTrace();
+			//e2.printStackTrace();
 		}
 	}
 
