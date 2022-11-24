@@ -219,13 +219,13 @@ public class ListenClient implements Runnable{
 					ResultSet resultset = r.getResultSet();
 					resultset.next();
 					BufferedImage bf = ImageIO.read(rs.getBinaryStream("photojoueur"));
-					Image im = new Image(bf, null);
+					Image im = new Image(bf, "png");
 					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
 					break;
 				case 4:
 					m.put(InfoID.Permission, Permission.ECURIE);
 					BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
-					Image im1 = new Image(bf1, null);
+					Image im1 = new Image(bf1, "png");
 					m.put(InfoID.Ecurie, new EcurieInfo(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), result));
 					break;
 				
