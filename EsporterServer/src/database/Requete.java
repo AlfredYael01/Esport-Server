@@ -73,6 +73,10 @@ public class Requete {
 		return "select id_equipe from cmf4263a.Utilisateur where Utilisateur.Id_Utilisateur = "+id;
 	}
 	
+	public static String getJeuxEquipe(int id) {
+		return "select id_jeux from cmf4263a.Equipe where id_equipe= "+id;
+	}
+	
 	/*
 	public static String AjouterTournoi(Date dateLimiteInscription, String nom, Date dateTournoi,int Id_Tournois, String Renommée ) {
 		return "INSERT INTO table VALUES (	"+ dateLimiteInscription +","+ nom +","+ dateTournoi +","+ Id_Tournois +","+ Renommée +");";

@@ -203,18 +203,6 @@ public class ListenClient implements Runnable{
 			res.getResultSet().next();
 			int id_equipe = res.getResultSet().getInt("id_equipe");
 			
-			//Recuperer jeux
-			r = new Requete(Requete.getJeux(id_Tournoi), typeRequete.REQUETE);
-			res = DatabaseAccess.getInstance().getData(r);
-			res.getResultSet().next();
-			int id_jeux = res.getResultSet().getInt("id_jeux");
-			
-			r = new Requete(Requete.InscriptionTournoi(id_jeux, id_Tournoi, id_equipe), typeRequete.PROCEDURE);
-			res = DatabaseAccess.getInstance().getData(r);
-			if (res.isError()) {
-				error("Vous etes deja inscrit");
-				return;
-			}
 			
 			TournoiInfo tournoi;
 			r = new Requete(Requete.getTournoiByID(id_Tournoi), typeRequete.REQUETE);
@@ -222,6 +210,31 @@ public class ListenClient implements Runnable{
 			ResultSet rs = res.getResultSet();
 			rs.next();
 			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			
+			Requete requete = new Requete(Requete.getJeuxEquipe(id_equipe), typeRequete.REQUETE);
+			ResultSet resultset = DatabaseAccess.getInstance().getData(requete).getResultSet();
+			resultset.next();
+			
+			Jeu jeuEquipe= Jeu.intToJeu(resultset.getInt("id_jeux"));
+			
+			System.out.println("Jeu tournoi :"+tournoi.getJeux()+", jeux equipe : "+jeuEquipe);
+			if (tournoi.getJeux() != jeuEquipe) {
+				error("Vous ne pouvez pas vous inscrire, ce jeu n'est celui de votre equipe");
+				return;
+			}
+			
+			
+			
+			r = new Requete(Requete.InscriptionTournoi(Jeu.jeuToInt(tournoi.getJeux()), id_Tournoi, id_equipe), typeRequete.PROCEDURE);
+			res = DatabaseAccess.getInstance().getData(r);
+			if (res.isError()) {
+				error("Vous etes deja inscrit");
+				return;
+			}
+			
+			
+			
+			
 			
 			r = new Requete(Requete.getInscris(id_Tournoi), typeRequete.REQUETE);
 			res = DatabaseAccess.getInstance().getData(r);
@@ -237,6 +250,7 @@ public class ListenClient implements Runnable{
 			mainThread.getInstance().miseAJourData(InfoID.Tournoi, tournoi);
 			
 		} catch (InterruptedException | SQLException e) {
+			e.printStackTrace();
 			error("Vous etes deja inscrit");
 		}
 	}
