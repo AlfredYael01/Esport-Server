@@ -91,6 +91,14 @@ public class TournoiInfo implements Infos, Serializable, Comparable<TournoiInfo>
 		return this.getDateInscription().compareTo(o.getDateInscription());
 	}
 	
+	public void ajouterInscris(int id_equipe) {
+		inscris.add(id_equipe);
+	}
+	
+	public void supprimerInscris(int id_equipe) {
+		inscris.remove((Object)id_equipe);
+	}
+	
 	
 	
 	

@@ -273,6 +273,9 @@ public class ListenClient implements Runnable{
 				return;
 			}
 			
+			mainThread.getInstance().getData().getCalendrier().get(id_Tournoi).supprimerInscris(id_equipe);
+			mainThread.getInstance().miseAJourData(InfoID.Tournoi, mainThread.getInstance().getData().getCalendrier().get(id_Tournoi));
+			
 			
 		} catch (InterruptedException | SQLException e) {
 			// TODO Auto-generated catch block
