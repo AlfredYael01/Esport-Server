@@ -92,6 +92,9 @@ public class ListenClient implements Runnable{
 				case INSCRIPTION_TOURNOI:
 					inscriptionTournoi(((Entier)c.getInfoByID(InfoID.Tournoi)).getEntier(), ((Entier)c.getInfoByID(InfoID.Joueur)).getEntier());
 					break;
+				case DESINSCRIPTION_TOURNOI:
+					desinscriptionTournoi(((Entier)c.getInfoByID(InfoID.Tournoi)).getEntier(), ((Entier)c.getInfoByID(InfoID.Joueur)).getEntier(), ((Entier)c.getInfoByID(InfoID.Jeu)).getEntier());
+					break;
 				case VOIR_CALENDRIER:
 					
 					break;
@@ -255,6 +258,28 @@ public class ListenClient implements Runnable{
 		}
 	}
 	
+	private void desinscriptionTournoi(int id_Tournoi, int id_Joueur, int id_Jeu) {
+		try {
+			//Recuperer equipe
+			Requete r = new Requete(Requete.getEquipeByJoueur(id_Joueur),typeRequete.REQUETE);
+			Result res = DatabaseAccess.getInstance().getData(r);
+			res.getResultSet().next();
+			int id_equipe = res.getResultSet().getInt("id_equipe");
+			
+			r = new Requete(Requete.desinscriptionTournoi(id_Jeu, id_Tournoi, id_equipe), typeRequete.PROCEDURE);
+			res = DatabaseAccess.getInstance().getData(r);
+			if (res.isError()) {
+				error("Vous n'êtes pas inscrit");
+				return;
+			}
+			
+			
+		} catch (InterruptedException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
 	private void logout() {
 		client.setIsLogin(false);

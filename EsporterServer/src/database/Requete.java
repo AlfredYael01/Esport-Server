@@ -78,8 +78,8 @@ public class Requete {
 	}
 	
 	/*
-	public static String AjouterTournoi(Date dateLimiteInscription, String nom, Date dateTournoi,int Id_Tournois, String Renommée ) {
-		return "INSERT INTO table VALUES (	"+ dateLimiteInscription +","+ nom +","+ dateTournoi +","+ Id_Tournois +","+ Renommée +");";
+	public static String AjouterTournoi(Date dateLimiteInscription, String nom, Date dateTournoi,int Id_Tournois, String Renommï¿½e ) {
+		return "INSERT INTO table VALUES (	"+ dateLimiteInscription +","+ nom +","+ dateTournoi +","+ Id_Tournois +","+ Renommï¿½e +");";
 	*/
 	public static String AjouterEquipe (int Id_Jeux, int Id_Ecurie ) {
 		return "{? = call cmf4263a.insertEquipe("+Id_Jeux +","+ Id_Ecurie+")}";
@@ -95,6 +95,10 @@ public class Requete {
 	
 	public static String InscriptionTournoi(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
 		return "{call cmf4263a.INSCRIPTIONTOURNOI ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";
+	}
+	
+	public static String desinscriptionTournoi(int Id_Jeux, int Id_Tournoi, int Id_Equipe) {
+		return "{call cmf4263a.DESINSCRIPTIONTOURNOI ("+ Id_Tournoi +","+ Id_Jeux +","+Id_Equipe+")}";
 	}
 	
 	public static String getTitreBuEcurie(int id) {
@@ -135,7 +139,7 @@ public class Requete {
 	/*
 	public static String VoirInfosEcurie4 (int IdEquipe) {
 
-		return "Select  j.Nom as Nom_Joueur , Prenom, Photo, DateNaissance, Date_de_contrat, Fin_de_contrat, j.Nationalité as Nationalité_Joueur From Joueur j Where 	Joueur.Id_Equipe 	= 	IdEquipe;";
+		return "Select  j.Nom as Nom_Joueur , Prenom, Photo, DateNaissance, Date_de_contrat, Fin_de_contrat, j.Nationalitï¿½ as Nationalitï¿½_Joueur From Joueur j Where 	Joueur.Id_Equipe 	= 	IdEquipe;";
 
 	}*/
 	
