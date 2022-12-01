@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class TournoiInfo implements Infos, Serializable, Comparable<TournoiInfo> {
+public class TournoiInfo implements Infos, Serializable, Comparable<TournoiInfo>, Cloneable{
 
 	/**
 	 * 
@@ -97,6 +97,17 @@ public class TournoiInfo implements Infos, Serializable, Comparable<TournoiInfo>
 	
 	public void supprimerInscris(int id_equipe) {
 		inscris.remove((Object)id_equipe);
+	}
+	
+	@Override
+	public TournoiInfo clone(){
+		TournoiInfo cloned = null;
+		try {
+			cloned = (TournoiInfo) super.clone();
+		} catch (CloneNotSupportedException e) {
+			e.printStackTrace();
+		}
+		return cloned;
 	}
 	
 	
