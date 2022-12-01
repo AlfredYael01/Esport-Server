@@ -239,14 +239,7 @@ public class ListenClient implements Runnable{
 			
 			
 			
-			r = new Requete(Requete.getInscris(id_Tournoi), typeRequete.REQUETE);
-			res = DatabaseAccess.getInstance().getData(r);
-			rs = res.getResultSet();
-			ArrayList<Integer> inscrits = new ArrayList<>();
-			while (rs.next()) {
-				inscrits.add(rs.getInt("id_equipe"));
-			}
-			tournoi.setInscris(inscrits);
+			tournoi.ajouterInscris(id_equipe);
 			
 			//Il manque le get Poule
 			
@@ -273,8 +266,20 @@ public class ListenClient implements Runnable{
 				return;
 			}
 			
-			mainThread.getInstance().getData().getCalendrier().get(id_Tournoi).supprimerInscris(id_equipe);
-			mainThread.getInstance().miseAJourData(InfoID.Tournoi, mainThread.getInstance().getData().getCalendrier().get(id_Tournoi));
+			
+			TournoiInfo tournoi;
+			r = new Requete(Requete.getTournoiByID(id_Tournoi), typeRequete.REQUETE);
+			res = DatabaseAccess.getInstance().getData(r);
+			ResultSet rs = res.getResultSet();
+			rs.next();
+			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			
+			
+			
+			//TournoiInfo tournoi = mainThread.getInstance().getData().getCalendrier().get(id_Tournoi).clone();
+			tournoi.supprimerInscris(id_equipe);
+
+			mainThread.getInstance().miseAJourData(InfoID.Tournoi, tournoi);
 			
 			
 		} catch (InterruptedException | SQLException e) {
