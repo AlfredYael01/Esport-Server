@@ -136,6 +136,13 @@ public class Requete {
 	public static String removeEquipe(int id) {
 		return "delete from cmf4263a.Equipe where id_equipe = "+id;
 	}
+	
+	public static String modifierJoueur(String prenom, String nom, int Id_Equipe) {
+		return "{call cmf4263a.modifyJoueur('"+nom+"','"+prenom+"',?,?,?,?"+Id_Equipe+")}";
+	}
+	public static String SupprimerTournoi(int Id_Tournoi) {
+		return "{call cmf4362a.SupprimerTournoi("+Id_Tournoi+")}"; 
+	}
 	/*
 	public static String VoirInfosEcurie4 (int IdEquipe) {
 
