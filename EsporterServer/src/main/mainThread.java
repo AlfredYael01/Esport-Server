@@ -70,7 +70,7 @@ public class mainThread {
 		} catch (IOException e) {
 			//e.printStackTrace();
 		} catch (SQLException e1) {
-			//e1.printStackTrace();
+			e1.printStackTrace();
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
 			//e2.printStackTrace();
@@ -122,9 +122,9 @@ public class mainThread {
 				requeteGetJoueur = new Requete(Requete.allJoueurByEquipe(rs.getInt("Id_Equipe")), typeRequete.REQUETE);
 				resultJoueur = db.getData(requeteGetJoueur).getResultSet();
 				while(resultJoueur.next()) {
-					BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("photojoueur"));
+					BufferedImage bf1 = ImageIO.read(resultJoueur.getBinaryStream("photojoueur"));
 					Image im1 = new Image(bf1, "png");
-					joueurs.put(resultJoueur.getInt("Id_Utilisateur"), new JoueurInfo(resultJoueur.getInt("Id_Utilisateur"), rs.getString("nomjoueur"), rs.getString("prenomjoueur"), im1, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), ec.getId()));
+					joueurs.put(resultJoueur.getInt("Id_Utilisateur"), new JoueurInfo(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getDate("datenaissancejoueur"), resultJoueur.getDate("datecontratjoueur"), resultJoueur.getDate("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId()));
 				}
 				equipe = new EquipeInfo(Jeu.intToJeu(rs.getInt("Id_Jeux")), ec , joueurs, rs.getInt("Id_Equipe"));
 				ec.ajouterEquipe(equipe);

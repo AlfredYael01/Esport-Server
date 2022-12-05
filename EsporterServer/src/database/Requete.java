@@ -114,7 +114,7 @@ public class Requete {
 	}
 	
 	public static String allJoueurByEquipe(int id) {
-		return "select nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, u.id_equipe, id_nationalite from cmf4263a.Utilisateur u, cmf4263a.Equipe e where "+id+" = e.id_Utilisateur and e.id_equipe = u.id_equipe and id_role = 3";
+		return "select id_utilisateur, nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur from cmf4263a.Utilisateur where "+id+" = id_equipe and id_role = 3";
 	}
 	
 	public static String allEquipeByEcurie(int id) {
