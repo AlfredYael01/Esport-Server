@@ -50,6 +50,11 @@ public class DatabaseAccess {
 								try {
 									CallableStatement cstmt = conn.prepareCall(r.getRequete());
 									cstmt.registerOutParameter(1, Types.INTEGER);
+									if (r.getDates()!=null) {
+										for (int i=2;i<r.getDates().length+2;i++) {
+											cstmt.setDate(i, r.getDates()[i-2]);
+										}
+									}
 									cstmt.executeUpdate();
 									int entier = cstmt.getInt(1);
 									rs.setEntier(entier);

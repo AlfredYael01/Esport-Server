@@ -13,6 +13,10 @@ LOCAL, NATIONAL, INTERNATIONAL;
 		return null;
 
 	}
+	
+	public static int FameToInt(Renomme r) throws IllegalArgumentException{
+		return r.ordinal()+1;
+	}
 
 }
 

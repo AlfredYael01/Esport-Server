@@ -13,7 +13,9 @@ import database.Requete.typeRequete;
 import database.Result;
 import socket.ResponseObject;
 import types.InfoID;
+import types.Jeu;
 import types.Permission;
+import types.Renomme;
 import types.TournoiInfo;
 
 public class ConnectionClient {
@@ -62,7 +64,8 @@ public class ConnectionClient {
 	}
 	
 	public int ajouterTournoi(TournoiInfo t) {
-		Requete req = new Requete(Requete.ajouterTournoi(t.getJeux().ordinal(), t.getDateInscription(), t.getNom(), t.getRenomme().ordinal()), typeRequete.INSERT);
+		Requete req = new Requete(Requete.ajouterTournoi(Jeu.jeuToInt(t.getJeux()), t.getNom(), Renomme.FameToInt(t.getRenomme())), typeRequete.FONCTION);
+		req.setDates(t.getDateInscription());
 		try {
 			Result r = DatabaseAccess.getInstance().insertData(req);
 			int id = r.getEntier();

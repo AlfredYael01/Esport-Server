@@ -89,8 +89,8 @@ public class Requete {
 		return "select id_jeux from cmf4263a.Tournoi where id_tournois ="+id_tournoi;
 	}
 	
-	public static String ajouterTournoi (int id_jeux, Date datelimite, String nom, int renommee) {
-		return String.format("{? = call cmf4263a.inserttournoi(%d,"+datelimite+",%s,%d)}", id_jeux, nom, renommee);
+	public static String ajouterTournoi (int id_jeux, String nom, int renommee) {
+		return String.format("{? = call cmf4263a.inserttournoi(%d,?,'%s',%d)}", id_jeux, nom, renommee);
 	}
 	
 	public static String InscriptionTournoi(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
