@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Date;
 
-import types.registerJoueur;
+import types.TypesRegisterPlayer;
 
 public class Requete {
 

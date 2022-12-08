@@ -11,7 +11,7 @@ import java.util.Base64;
 
 import javax.imageio.ImageIO;
 
-public class Image implements Infos, Serializable {
+public class TypesImage implements Types, Serializable {
 
 	/**
 	 * 
@@ -19,7 +19,7 @@ public class Image implements Infos, Serializable {
 	private static final long serialVersionUID = -1572748294734274384L;
 	private String image;
 	
-	public Image (BufferedImage img, String formatName) {
+	public TypesImage (BufferedImage img, String formatName) {
 		image = imgToBase64String(img, formatName);
 	}
 	

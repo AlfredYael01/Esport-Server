@@ -10,7 +10,7 @@ import java.sql.Types;
 import java.util.Map.Entry;
 
 import main.mainThread;
-import types.EcurieInfo;
+import types.TypesStable;
 
 
 public class DatabaseAccess {
@@ -195,8 +195,8 @@ public class DatabaseAccess {
 		return data.getValue();
 	}
 	
-	public EcurieInfo getEcurie(Requete requete) throws InterruptedException {
-		EcurieInfo ecurie = new EcurieInfo(null, null, null, 0);
+	public TypesStable getEcurie(Requete requete) throws InterruptedException {
+		TypesStable ecurie = new TypesStable(null, null, null, 0);
 		int id = in.put(requete);
 		Entry<Integer, Result> data;
 		data = out.get(id);

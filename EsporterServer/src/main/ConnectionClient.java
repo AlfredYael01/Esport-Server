@@ -12,9 +12,9 @@ import database.Requete;
 import database.Requete.typeRequete;
 import database.Result;
 import socket.ResponseObject;
-import types.InfoID;
-import types.Permission;
-import types.TournoiInfo;
+import types.TypesID;
+import types.TypesPermission;
+import types.TypesTournament;
 
 public class ConnectionClient {
 
@@ -24,7 +24,7 @@ public class ConnectionClient {
 	private ObjectOutputStream out;
 	private ObjectInputStream in;
 	private boolean isLogin = false;
-	private Permission role = Permission.VISITEUR;
+	private TypesPermission role = TypesPermission.VISITOR;
 	
 	public ConnectionClient(Socket s) {
 		this.s = s;
@@ -61,13 +61,13 @@ public class ConnectionClient {
 		return -1;*/
 	}
 	
-	public int ajouterTournoi(TournoiInfo t) {
-		Requete req = new Requete(Requete.ajouterTournoi(t.getJeux().ordinal(), t.getDateInscription(), t.getNom(), t.getRenomme().ordinal()), typeRequete.INSERT);
+	public int ajouterTournoi(TypesTournament t) {
+		Requete req = new Requete(Requete.ajouterTournoi(t.getGame().ordinal(), t.getRegisterDate(), t.getName(), t.getFame().ordinal()), typeRequete.INSERT);
 		try {
 			Result r = DatabaseAccess.getInstance().insertData(req);
 			int id = r.getEntier();
 			t.setId(id);
-			mainThread.getInstance().miseAJourData(InfoID.Tournoi, t);
+			mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, t);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,18 +82,18 @@ public class ConnectionClient {
 	
 	public void setPermission(int perm) {
 		switch(perm) {
-		case 1:role = Permission.ORGANISATEUR;break;
-		case 2:role = Permission.ARBITRE;break;
-		case 3:role = Permission.JOUEUR;break;
-		case 4:role = Permission.ECURIE;break;
+		case 1:role = TypesPermission.ORGANIZER;break;
+		case 2:role = TypesPermission.REFEREE;break;
+		case 3:role = TypesPermission.PLAYER;break;
+		case 4:role = TypesPermission.STABLE;break;
 		}
 	}
 	
-	public Permission getRole() {
+	public TypesPermission getRole() {
 		return role;
 	}
 	
-	public void setPermission(Permission perm) {
+	public void setPermission(TypesPermission perm) {
 		role = perm;
 	}
 	

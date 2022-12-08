@@ -26,20 +26,20 @@ import socket.Command;
 import socket.CommandName;
 import socket.Response;
 import socket.ResponseObject;
-import types.EcurieInfo;
-import types.Entier;
-import types.EquipeInfo;
-import types.Image;
-import types.InfoID;
-import types.Infos;
-import types.Jeu;
-import types.JoueurInfo;
-import types.Login;
-import types.Permission;
-import types.RegisterEquipe;
-import types.Renomme;
-import types.TournoiInfo;
-import types.registerJoueur;
+import types.TypesStable;
+import types.TypesInteger;
+import types.TypesTeam;
+import types.TypesImage;
+import types.TypesID;
+import types.Types;
+import types.TypesGame;
+import types.TypesPlayer;
+import types.TypesLogin;
+import types.TypesPermission;
+import types.TypesRegisterTeam;
+import types.TypesFame;
+import types.TypesTournament;
+import types.TypesRegisterPlayer;
 
 public class ListenClient implements Runnable{
 	
@@ -79,21 +79,21 @@ public class ListenClient implements Runnable{
 					logout();
 					break;
 				case AJOUTER_EQUIPE:
-					if(client.getRole()!=Permission.ECURIE) {
+					if(client.getRole()!=TypesPermission.STABLE) {
 						errorPermission();
 						break;
 					}
-					RegisterEquipe equipe = (RegisterEquipe) c.getInfoByID(InfoID.Equipe);
+					TypesRegisterTeam equipe = (TypesRegisterTeam) c.getInfoByID(TypesID.TEAM);
 					ajouterEquipe(equipe);
 					break;
 				case AJOUTER_TOURNOI:
-					client.ajouterTournoi((TournoiInfo)c.getInfoByID(InfoID.Tournoi));
+					client.ajouterTournoi((TypesTournament)c.getInfoByID(TypesID.TOURNAMENT));
 					break;
 				case INSCRIPTION_TOURNOI:
-					inscriptionTournoi(((Entier)c.getInfoByID(InfoID.Tournoi)).getEntier(), ((Entier)c.getInfoByID(InfoID.Joueur)).getEntier());
+					inscriptionTournoi(((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger(), ((TypesInteger)c.getInfoByID(TypesID.PLAYER)).getInteger());
 					break;
 				case DESINSCRIPTION_TOURNOI:
-					desinscriptionTournoi(((Entier)c.getInfoByID(InfoID.Tournoi)).getEntier(), ((Entier)c.getInfoByID(InfoID.Joueur)).getEntier(), ((Entier)c.getInfoByID(InfoID.Jeu)).getEntier());
+					desinscriptionTournoi(((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger(), ((TypesInteger)c.getInfoByID(TypesID.PLAYER)).getInteger(), ((TypesInteger)c.getInfoByID(TypesID.GAME)).getInteger());
 					break;
 				case VOIR_CALENDRIER:
 					
@@ -115,8 +115,8 @@ public class ListenClient implements Runnable{
 				case INIT:
 					
 					Data d = mainThread.getInstance().getData();
-					HashMap<InfoID,Infos> m = new HashMap<>();
-					m.put(InfoID.all, d);
+					HashMap<TypesID,Types> m = new HashMap<>();
+					m.put(TypesID.ALL, d);
 					ResponseObject r = new ResponseObject(Response.UPDATE_ALL, m, null);
 					client.send(r);
 					System.out.println("Send init");
@@ -127,10 +127,10 @@ public class ListenClient implements Runnable{
 		}
 	}
 	
-	private void ajouterEquipe(RegisterEquipe equipe) {
+	private void ajouterEquipe(TypesRegisterTeam equipe) {
 		Result res = null;
 		try {
-			Requete r = new Requete(Requete.AjouterEquipe(Jeu.jeuToInt(equipe.getJeu()), equipe.getIdEcurie()), typeRequete.FONCTION);
+			Requete r = new Requete(Requete.AjouterEquipe(TypesGame.gameToInt(equipe.getGame()), equipe.getIdStable()), typeRequete.FONCTION);
 			res = DatabaseAccess.getInstance().getData(r);
 			if (res.isError()) {
 				error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
@@ -142,25 +142,25 @@ public class ListenClient implements Runnable{
 		}
 		try {
 			
-			Requete temp = new Requete(Requete.VoirInfosEcurie(equipe.getIdEcurie()),typeRequete.REQUETE);
+			Requete temp = new Requete(Requete.VoirInfosEcurie(equipe.getIdStable()),typeRequete.REQUETE);
 			Result tempRes = DatabaseAccess.getInstance().getData(temp);
 			ResultSet rs = tempRes.getResultSet();
 			rs.next();
 			BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
-			Image im1 = new Image(bf1, "png");
+			TypesImage im1 = new TypesImage(bf1, "png");
 			 
-			EcurieInfo ecurie = new EcurieInfo(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), equipe.getIdEcurie());
+			TypesStable ecurie = new TypesStable(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), equipe.getIdStable());
 			
-			EquipeInfo eq = new EquipeInfo(equipe.getJeu(), ecurie, null,res.getEntier());
-			HashMap<Integer, JoueurInfo> joueurs = new HashMap<>();
-			for (registerJoueur jou : equipe.getJoueurs()) {
-				JoueurInfo joueur = jou.getJoueur();
-				Requete reqJou = new Requete(Requete.AjouterJoueur(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getNom(),joueur.getPrenom(), res.getEntier(), 1),typeRequete.INSERTJOUEUR);
+			TypesTeam eq = new TypesTeam(equipe.getGame(), ecurie, null,res.getEntier());
+			HashMap<Integer, TypesPlayer> joueurs = new HashMap<>();
+			for (TypesRegisterPlayer jou : equipe.getPlayers()) {
+				TypesPlayer joueur = jou.getPlayer();
+				Requete reqJou = new Requete(Requete.AjouterJoueur(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getName(),joueur.getFirstName(), res.getEntier(), 1),typeRequete.INSERTJOUEUR);
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
-	            ImageIO.write(joueur.getPhoto().getImage(), "png", os);
+	            ImageIO.write(joueur.getImage().getImage(), "png", os);
 	            InputStream is = new ByteArrayInputStream(os.toByteArray());
 				reqJou.setInputStream(is);
-				reqJou.setDates(joueur.getDateNaissance(), joueur.getDateDebutContrat(), joueur.getDateFinContrat());
+				reqJou.setDates(joueur.getBirthDate(), joueur.getContractStartDate(), joueur.getContractEndDate());
 				Result resJou = DatabaseAccess.getInstance().getData(reqJou);
 				if (resJou.isError()) {
 					erreurAjoutEquipe(res.getEntier());
@@ -170,8 +170,8 @@ public class ListenClient implements Runnable{
 				joueur.setId(resJou.getEntier());
 				joueurs.put(resJou.getEntier(), joueur);
 			}
-			eq.setJoueurs(joueurs);
-			mainThread.getInstance().miseAJourData(InfoID.Equipe, eq);
+			eq.setPlayers(joueurs);
+			mainThread.getInstance().miseAJourData(TypesID.TEAM, eq);
 				
 		} catch (InterruptedException | SQLException e) {
 			erreurAjoutEquipe(res.getEntier());
@@ -207,28 +207,28 @@ public class ListenClient implements Runnable{
 			int id_equipe = res.getResultSet().getInt("id_equipe");
 			
 			
-			TournoiInfo tournoi;
+			TypesTournament tournoi;
 			r = new Requete(Requete.getTournoiByID(id_Tournoi), typeRequete.REQUETE);
 			res = DatabaseAccess.getInstance().getData(r);
 			ResultSet rs = res.getResultSet();
 			rs.next();
-			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 			
 			Requete requete = new Requete(Requete.getJeuxEquipe(id_equipe), typeRequete.REQUETE);
 			ResultSet resultset = DatabaseAccess.getInstance().getData(requete).getResultSet();
 			resultset.next();
 			
-			Jeu jeuEquipe= Jeu.intToJeu(resultset.getInt("id_jeux"));
+			TypesGame jeuEquipe= TypesGame.intToGame(resultset.getInt("id_jeux"));
 			
-			System.out.println("Jeu tournoi :"+tournoi.getJeux()+", jeux equipe : "+jeuEquipe);
-			if (tournoi.getJeux() != jeuEquipe) {
+			System.out.println("Jeu tournoi :"+tournoi.getGame()+", jeux equipe : "+jeuEquipe);
+			if (tournoi.getGame() != jeuEquipe) {
 				error("Vous ne pouvez pas vous inscrire, ce jeu n'est celui de votre equipe");
 				return;
 			}
 			
 			
 			
-			r = new Requete(Requete.InscriptionTournoi(Jeu.jeuToInt(tournoi.getJeux()), id_Tournoi, id_equipe), typeRequete.PROCEDURE);
+			r = new Requete(Requete.InscriptionTournoi(TypesGame.gameToInt(tournoi.getGame()), id_Tournoi, id_equipe), typeRequete.PROCEDURE);
 			res = DatabaseAccess.getInstance().getData(r);
 			if (res.isError()) {
 				error("Vous etes deja inscrit");
@@ -239,11 +239,11 @@ public class ListenClient implements Runnable{
 			
 			
 			
-			tournoi.ajouterInscris(id_equipe);
+			tournoi.registerTeam(id_equipe);
 			
 			//Il manque le get Poule
 			
-			mainThread.getInstance().miseAJourData(InfoID.Tournoi, tournoi);
+			mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, tournoi);
 			
 		} catch (InterruptedException | SQLException e) {
 			e.printStackTrace();
@@ -267,19 +267,19 @@ public class ListenClient implements Runnable{
 			}
 			
 			
-			TournoiInfo tournoi;
+			TypesTournament tournoi;
 			r = new Requete(Requete.getTournoiByID(id_Tournoi), typeRequete.REQUETE);
 			res = DatabaseAccess.getInstance().getData(r);
 			ResultSet rs = res.getResultSet();
 			rs.next();
-			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 			
 			
 			
 			//TournoiInfo tournoi = mainThread.getInstance().getData().getCalendrier().get(id_Tournoi).clone();
-			tournoi.supprimerInscris(id_equipe);
+			tournoi.unregisterTeam(id_equipe);
 
-			mainThread.getInstance().miseAJourData(InfoID.Tournoi, tournoi);
+			mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, tournoi);
 			
 			
 		} catch (InterruptedException | SQLException e) {
@@ -291,7 +291,7 @@ public class ListenClient implements Runnable{
 	
 	private void logout() {
 		client.setIsLogin(false);
-		client.setPermission(Permission.VISITEUR);
+		client.setPermission(TypesPermission.VISITOR);
 	}
 	
 	private void errorPermission() {
@@ -310,7 +310,7 @@ public class ListenClient implements Runnable{
 	}
 	
 	private void login(Command c) {
-		Login l = (Login) c.getInfoByID(InfoID.login);
+		TypesLogin l = (TypesLogin) c.getInfoByID(TypesID.LOGIN);
 		int result = client.login(l.getUsername(), l.getPassword());
 		if (result == -1) {
 			ErrorLogin();
@@ -324,28 +324,28 @@ public class ListenClient implements Runnable{
 				rs.next();
 				int perm = rs.getInt("id_role");
 				client.setPermission(perm);
-				HashMap<InfoID,Infos> m = new HashMap<>();
+				HashMap<TypesID,Types> m = new HashMap<>();
 				switch (perm) {
 				case 1:
-					m.put(InfoID.Permission, Permission.ORGANISATEUR);
+					m.put(TypesID.PERMISSION, TypesPermission.ORGANIZER);
 					break;
 				case 2:
-					m.put(InfoID.Permission, Permission.ARBITRE);
+					m.put(TypesID.PERMISSION, TypesPermission.REFEREE);
 					break;
 				case 3:
-					m.put(InfoID.Permission, Permission.JOUEUR);
+					m.put(TypesID.PERMISSION, TypesPermission.PLAYER);
 					Result r = DatabaseAccess.getInstance().getData(new Requete(Requete.getEquipeByJoueur(result), typeRequete.REQUETE));
 					ResultSet resultset = r.getResultSet();
 					resultset.next();
 					BufferedImage bf = ImageIO.read(rs.getBinaryStream("photojoueur"));
-					Image im = new Image(bf, "png");
-					m.put(InfoID.Joueur, new JoueurInfo(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
+					TypesImage im = new TypesImage(bf, "png");
+					m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
 					break;
 				case 4:
-					m.put(InfoID.Permission, Permission.ECURIE);
+					m.put(TypesID.PERMISSION, TypesPermission.STABLE);
 					BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
-					Image im1 = new Image(bf1, "png");
-					m.put(InfoID.Ecurie, new EcurieInfo(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), result));
+					TypesImage im1 = new TypesImage(bf1, "png");
+					m.put(TypesID.STABLE, new TypesStable(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), result));
 					break;
 				
 				}

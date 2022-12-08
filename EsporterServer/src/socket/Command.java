@@ -5,12 +5,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import types.EcurieInfo;
-import types.EquipeInfo;
-import types.InfoID;
-import types.Infos;
-import types.JoueurInfo;
-import types.TournoiInfo;
+import types.TypesStable;
+import types.TypesTeam;
+import types.TypesID;
+import types.Types;
+import types.TypesPlayer;
+import types.TypesTournament;
 
 public class Command implements Serializable{
 
@@ -19,11 +19,11 @@ public class Command implements Serializable{
 	 */
 	private static final long serialVersionUID = -8562553476003862463L;
 	private CommandName name;
-	private Map<InfoID,Infos> info = new HashMap<>(); 
+	private Map<TypesID,Types> info = new HashMap<>(); 
 	
 	
 	
-	public Command(CommandName name, Map<InfoID,Infos> info) {
+	public Command(CommandName name, Map<TypesID,Types> info) {
 		this.name = name;
 		this.info = info;
 	}
@@ -33,11 +33,11 @@ public class Command implements Serializable{
 	}
 
 	
-	public Map<InfoID, Infos> getInfo() {
+	public Map<TypesID, Types> getInfo() {
 		return info;
 	}
 	
-	public Infos getInfoByID(InfoID id) {
+	public Types getInfoByID(TypesID id) {
 		if (this.info.get(id)==null) {
 			return null;
 		}
@@ -46,7 +46,7 @@ public class Command implements Serializable{
 	
 	public String toString() {
 		String output = "[MAP";
-		for (InfoID key : info.keySet()) {
+		for (TypesID key : info.keySet()) {
 	        output+=(key + "=" + info.get(key) + ", ");
 	    }
 		return output;

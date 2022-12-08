@@ -18,16 +18,16 @@ import database.Requete;
 import database.Requete.typeRequete;
 import socket.Response;
 import socket.ResponseObject;
-import types.EcurieInfo;
-import types.EquipeInfo;
-import types.Image;
-import types.InfoID;
-import types.Infos;
-import types.Jeu;
-import types.JoueurInfo;
-import types.Renomme;
-import types.Titre;
-import types.TournoiInfo;
+import types.TypesStable;
+import types.TypesTeam;
+import types.TypesImage;
+import types.TypesID;
+import types.Types;
+import types.TypesGame;
+import types.TypesPlayer;
+import types.TypesFame;
+import types.TypesTitle;
+import types.TypesTournament;
 
 public class mainThread {
 
@@ -99,21 +99,21 @@ public class mainThread {
 		//ECURIE
 		Requete r = new Requete(Requete.allEcurie(), typeRequete.REQUETE);
 		ResultSet rs = db.getData(r).getResultSet();
-		HashMap<Integer, EcurieInfo> ecuries = new HashMap<>();
+		HashMap<Integer, TypesStable> ecuries = new HashMap<>();
 		while(rs.next()) {
 			BufferedImage bf1 = ImageIO.read(rs.getBinaryStream("logoecurie"));
-			Image im1 = new Image(bf1, "png");
-			ecuries.put(rs.getInt("id_utilisateur"), new EcurieInfo(rs.getString("nomEcurie"), im1, rs.getString("DiminutifEcurie"), rs.getInt("id_utilisateur")));
+			TypesImage im1 = new TypesImage(bf1, "png");
+			ecuries.put(rs.getInt("id_utilisateur"), new TypesStable(rs.getString("nomEcurie"), im1, rs.getString("DiminutifEcurie"), rs.getInt("id_utilisateur")));
 		}
-		data.setEcuries(ecuries);
+		data.setStables(ecuries);
 		//EQUIPE
-		EquipeInfo equipe;
-		JoueurInfo joueur;
+		TypesTeam equipe;
+		TypesPlayer joueur;
 		ResultSet resultJoueur;
 		Requete requeteGetJoueur;
-		HashMap<Integer,JoueurInfo> joueurs;
-		ArrayList<Titre> palmares;
-		for (EcurieInfo ec : data.getListEcurie()) {
+		HashMap<Integer,TypesPlayer> joueurs;
+		ArrayList<TypesTitle> palmares;
+		for (TypesStable ec : data.listStables()) {
 			r = new Requete(Requete.allEquipeByEcurie(ec.getId()), typeRequete.REQUETE);
 			rs = db.getData(r).getResultSet();
 			while(rs.next()) {
@@ -123,11 +123,11 @@ public class mainThread {
 				resultJoueur = db.getData(requeteGetJoueur).getResultSet();
 				while(resultJoueur.next()) {
 					BufferedImage bf1 = ImageIO.read(resultJoueur.getBinaryStream("photojoueur"));
-					Image im1 = new Image(bf1, "png");
-					joueurs.put(resultJoueur.getInt("Id_Utilisateur"), new JoueurInfo(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getDate("datenaissancejoueur"), resultJoueur.getDate("datecontratjoueur"), resultJoueur.getDate("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId()));
+					TypesImage im1 = new TypesImage(bf1, "png");
+					joueurs.put(resultJoueur.getInt("Id_Utilisateur"), new TypesPlayer(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getDate("datenaissancejoueur"), resultJoueur.getDate("datecontratjoueur"), resultJoueur.getDate("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId()));
 				}
-				equipe = new EquipeInfo(Jeu.intToJeu(rs.getInt("Id_Jeux")), ec , joueurs, rs.getInt("Id_Equipe"));
-				ec.ajouterEquipe(equipe);
+				equipe = new TypesTeam(TypesGame.intToGame(rs.getInt("Id_Jeux")), ec , joueurs, rs.getInt("Id_Equipe"));
+				ec.addTeam(equipe);
 			}
 			
 			r = new Requete(Requete.getTitreBuEcurie(ec.getId()), typeRequete.REQUETE);
@@ -135,10 +135,10 @@ public class mainThread {
 			palmares = new ArrayList<>();
 			while(rs.next()) {
 				//Titre
-				palmares.add(new Titre(rs.getString("libelle"),rs.getDate("dateobtention")));
+				palmares.add(new TypesTitle(rs.getString("libelle"),rs.getDate("dateobtention")));
 				
 			}
-			ec.setPalmares(palmares);
+			ec.setTitles(palmares);
 			
 			
 		}
@@ -148,51 +148,51 @@ public class mainThread {
 		//Tournoi
 		r = new Requete(Requete.getCalendrier(), typeRequete.REQUETE);
 		rs = db.getData(r).getResultSet();
-		HashMap<Integer, TournoiInfo> calendrier = new HashMap<>();
-		TournoiInfo tournoi;
+		HashMap<Integer, TypesTournament> calendrier = new HashMap<>();
+		TypesTournament tournoi;
 		Requete req;
 		ResultSet res;
 		ArrayList<Integer> inscrits;
 		while(rs.next()) {
-			tournoi = new TournoiInfo(rs.getDate("datelimiteinscription"), rs.getString("nom"), Renomme.intToRenommee(rs.getInt("Renommee")), Jeu.intToJeu(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 			req = new Requete(Requete.getInscris(tournoi.getId()), typeRequete.REQUETE);
 			res = DatabaseAccess.getInstance().getData(req).getResultSet();
 			inscrits = new ArrayList<>();
 			while (res.next()) {
 				inscrits.add(res.getInt("id_equipe"));
 			}
-			tournoi.setInscris(inscrits);
+			tournoi.setRegistered(inscrits);
 			calendrier.put(rs.getInt("id_tournois"), tournoi);
 		}
-		this.data.setCalendrier(calendrier);
+		this.data.setCalendar(calendrier);
 			//Poule
 				//Rencontre
 		//Classement
 	}
 	
 	
-	public synchronized void miseAJourData(InfoID info, Infos data) {
+	public synchronized void miseAJourData(TypesID info, Types data) {
 		System.out.println("MISE A JOUR DES DATA");
 		ResponseObject r;
-		HashMap<InfoID, Infos> m = new HashMap<>();
+		HashMap<TypesID, Types> m = new HashMap<>();
 		m.put(info, data);
 		switch (info) {
-		case Joueur:
-			JoueurInfo joueur = (JoueurInfo)data;
-			this.data.getEcuries().get(joueur.getId_ecurie()).getEquipes().get(joueur.getId_equipe()).modifierJoueur(joueur);
+		case PLAYER:
+			TypesPlayer joueur = (TypesPlayer)data;
+			this.data.getStables().get(joueur.getIdStable()).getTeams().get(joueur.getIdTeam()).modifyPlayer(joueur);
 			r = new ResponseObject(Response.UPDATE_JOUEUR, m, null);
 			sendAll(r);
 			break;
-		case Tournoi:
-			TournoiInfo tournoi = (TournoiInfo)data;
-			this.data.getCalendrier().put(tournoi.getId(), tournoi);
+		case TOURNAMENT:
+			TypesTournament tournoi = (TypesTournament)data;
+			this.data.getCalendar().put(tournoi.getId(), tournoi);
 			r = new ResponseObject(Response.UPDATE_TOURNOI, m, null);
 			System.out.println();
 			sendAll(r);
 			break;
-		case Equipe:
-			EquipeInfo equipe = (EquipeInfo)data;
-			this.data.getEcuries().get(equipe.getEcurie().getId()).getEquipes().put(equipe.getId(), equipe);
+		case TEAM:
+			TypesTeam equipe = (TypesTeam)data;
+			this.data.getStables().get(equipe.getStable().getId()).getTeams().put(equipe.getId(), equipe);
 			r = new ResponseObject(Response.UPDATE_EQUIPE, m, null);
 			sendAll(r);
 			break;

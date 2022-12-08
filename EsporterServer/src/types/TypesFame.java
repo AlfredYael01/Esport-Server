@@ -1,10 +1,10 @@
 package types;
 
-public enum Renomme {
+public enum TypesFame {
 LOCAL, NATIONAL, INTERNATIONAL;
 	
 	
-	public static Renomme intToRenommee(int i) {
+	public static TypesFame intToRenommee(int i) {
 		switch(i) {
 		case 1:return LOCAL;
 		case 2:return NATIONAL;
