@@ -17,15 +17,15 @@ import java.util.Timer;
 
 import javax.imageio.ImageIO;
 
-import data.Data;
 import database.DatabaseAccess;
 import database.Query;
 import database.Query.typeRequete;
+import model.data.Data;
+import model.socket.Command;
+import model.socket.CommandName;
+import model.socket.Response;
+import model.socket.ResponseObject;
 import database.Result;
-import socket.Command;
-import socket.CommandName;
-import socket.Response;
-import socket.ResponseObject;
 import types.TypesStable;
 import types.TypesInteger;
 import types.TypesTeam;
@@ -58,6 +58,7 @@ public class ListenClient implements Runnable{
 				commande(o);
 				
 			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				System.out.println("fin d'un thread");
 				mainThread.getInstance().closeClient(client);
