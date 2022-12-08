@@ -6,18 +6,18 @@ import java.sql.Date;
 
 import types.TypesRegisterPlayer;
 
-public class Requete {
+public class Query {
 
-	public enum typeRequete{FONCTION, REQUETE, PROCEDURE, INSERT, INSERTJOUEUR}
+	public enum typeRequete{FUNCTION, QUERY, PROCEDURE, INSERT, INSERTPLAYER}
 	
 	
-	private String requete;
+	private String query;
 	private typeRequete type;
 	private InputStream inputStream;
 	private Date[] dates = null;
 	private int[] integers = null;
-	public Requete(String requete, typeRequete type) {
-		this.requete = requete;
+	public Query(String requete, typeRequete type) {
+		this.query = requete;
 		this.type = type;
 	}
 	
@@ -54,26 +54,26 @@ public class Requete {
 		return "select nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, nomecurie, logoecurie, diminutifecurie, id_role, id_nationalite, id_equipe from cmf4263a.utilisateur where id_utilisateur = "+id;
 	}
 	
-	public static String getCalendrier() {
+	public static String getCalendar() {
 		return "select id_jeux, id_tournois, DateLimiteInscription, nom, renommee from cmf4263a.Tournoi";
 	}
 	
-	public static String getInscris(int id_tournoi) {
+	public static String getRegistered(int id_tournoi) {
 		return "select id_equipe from cmf4263a.Participer where id_tournois = "+id_tournoi;
 	}
 	
 	
 	
-	public static String getTournoiByID(int id) {
+	public static String getTournamentByID(int id) {
 		return "select id_jeux, id_tournois, DateLimiteInscription, nom, renommee from cmf4263a.Tournoi where id_tournois = "+id;
 	}
 	
 	
-	public static String getEquipeByJoueur(int id) {
+	public static String getTeamByPlayer(int id) {
 		return "select id_equipe from cmf4263a.Utilisateur where Utilisateur.Id_Utilisateur = "+id;
 	}
 	
-	public static String getJeuxEquipe(int id) {
+	public static String getTeamGame(int id) {
 		return "select id_jeux from cmf4263a.Equipe where id_equipe= "+id;
 	}
 	
@@ -81,66 +81,66 @@ public class Requete {
 	public static String AjouterTournoi(Date dateLimiteInscription, String nom, Date dateTournoi,int Id_Tournois, String Renomm�e ) {
 		return "INSERT INTO table VALUES (	"+ dateLimiteInscription +","+ nom +","+ dateTournoi +","+ Id_Tournois +","+ Renomm�e +");";
 	*/
-	public static String AjouterEquipe (int Id_Jeux, int Id_Ecurie ) {
+	public static String addTeam (int Id_Jeux, int Id_Ecurie ) {
 		return "{? = call cmf4263a.insertEquipe("+Id_Jeux +","+ Id_Ecurie+")}";
 	}	
 	
-	public static String getJeux (int id_tournoi) {
+	public static String getGame (int id_tournoi) {
 		return "select id_jeux from cmf4263a.Tournoi where id_tournois ="+id_tournoi;
 	}
 	
-	public static String ajouterTournoi (int id_jeux, Date datelimite, String nom, int renommee) {
-		return String.format("{? = call cmf4263a.inserttournoi(%d,"+datelimite+",%s,%d)}", id_jeux, nom, renommee);
+	public static String addTournament (int id_jeux, String nom, int renommee) {
+		return String.format("{? = call cmf4263a.inserttournoi(%d,?,'%s',%d)}", id_jeux, nom, renommee);
 	}
 	
-	public static String InscriptionTournoi(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
+	public static String registerTournament(int Id_Jeux,int Id_Tournois , int Id_Equipe) {
 		return "{call cmf4263a.INSCRIPTIONTOURNOI ("+ Id_Tournois +","+ Id_Jeux +","+Id_Equipe+")}";
 	}
 	
-	public static String desinscriptionTournoi(int Id_Jeux, int Id_Tournoi, int Id_Equipe) {
+	public static String unregisterTournament(int Id_Jeux, int Id_Tournoi, int Id_Equipe) {
 		return "{call cmf4263a.DESINSCRIPTIONTOURNOI ("+ Id_Tournoi +","+ Id_Jeux +","+Id_Equipe+")}";
 	}
 	
-	public static String getTitreBuEcurie(int id) {
+	public static String getTitleByStable(int id) {
 		return "select libelle, dateobtention from cmf4263a.Titre, cmf4263a.Gagner where Titre.id_titre = Gagner.id_Titre and Gagner.id_Utilisateur = "+id;
 	}
 	
-	public static String VoirInfosEcurie(int id) {
+	public static String getStableInfo(int id) {
 		return "Select NomEcurie, LogoEcurie, DiminutifEcurie from cmf4263a.Utilisateur WHERE	Id_Utilisateur 	=	"+ id;
 	}
 	
-	public static String allEcurie() {
+	public static String allStables() {
 		return "Select Id_Utilisateur, NomEcurie, LogoEcurie, DiminutifEcurie from cmf4263a.Utilisateur where id_role=4";
 	}
 	
-	public static String allJoueurByEquipe(int id) {
+	public static String allPlayerByTeam(int id) {
 		return "select id_utilisateur, nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur from cmf4263a.Utilisateur where "+id+" = id_equipe and id_role = 3";
 	}
 	
-	public static String allEquipeByEcurie(int id) {
+	public static String allTeamByStables(int id) {
 		return "select e.id_equipe, id_jeux, e.id_utilisateur from cmf4263a.Equipe e where "+id+" = e.id_Utilisateur";
 	}
 	
-	public static String ajouterEcurie(String  username, String password, String NomEcurie, String DiminutifEcurie, String LogoEcurie) {
+	public static String addStable(String  username, String password, String NomEcurie, String DiminutifEcurie, String LogoEcurie) {
 		return "{? = call cmf4263a.registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
 
 	}
-	public static String AjouterJoueur(String username,  String password , String NomJoueur, String PrenomJoueur, int Id_Equipe, int Id_Nationalite) {
+	public static String addPlayer(String username,  String password , String NomJoueur, String PrenomJoueur, int Id_Equipe, int Id_Nationalite) {
 		return "{? = call cmf4263a.registerJoueur('"+ username + "','"+ password+"','"+NomJoueur+ "','"+PrenomJoueur+"',?,?,?,?,"+Id_Nationalite+","+Id_Equipe+")}";
 	}
 	
-	public static String removeJoueurByEquipe(int id) {
+	public static String removePlayerByTeam(int id) {
 		return "delete from cmf4263a.Utilisateur where id_equipe = "+id;
 	}
 	
-	public static String removeEquipe(int id) {
+	public static String removeTeam(int id) {
 		return "delete from cmf4263a.Equipe where id_equipe = "+id;
 	}
 	
-	public static String modifierJoueur(String prenom, String nom, int Id_Equipe) {
+	public static String modifyPlayer(String prenom, String nom, int Id_Equipe) {
 		return "{call cmf4263a.modifyJoueur('"+nom+"','"+prenom+"',?,?,?,?"+Id_Equipe+")}";
 	}
-	public static String SupprimerTournoi(int Id_Tournoi) {
+	public static String removeTournament(int Id_Tournoi) {
 		return "{call cmf4362a.SupprimerTournoi("+Id_Tournoi+")}"; 
 	}
 	/*
@@ -155,8 +155,8 @@ public class Requete {
 	
 	
 	
-	public String getRequete() {
-		return requete;
+	public String getQuery() {
+		return query;
 	}
 	
 	public typeRequete getType() {

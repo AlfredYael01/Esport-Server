@@ -14,8 +14,8 @@ import javax.imageio.ImageIO;
 
 import data.Data;
 import database.DatabaseAccess;
-import database.Requete;
-import database.Requete.typeRequete;
+import database.Query;
+import database.Query.typeRequete;
 import socket.Response;
 import socket.ResponseObject;
 import types.TypesStable;
@@ -97,7 +97,7 @@ public class mainThread {
 	
 	public void initializeApp() throws InterruptedException, SQLException, IOException {
 		//ECURIE
-		Requete r = new Requete(Requete.allEcurie(), typeRequete.REQUETE);
+		Query r = new Query(Query.allStables(), typeRequete.QUERY);
 		ResultSet rs = db.getData(r).getResultSet();
 		HashMap<Integer, TypesStable> ecuries = new HashMap<>();
 		while(rs.next()) {
@@ -110,16 +110,16 @@ public class mainThread {
 		TypesTeam equipe;
 		TypesPlayer joueur;
 		ResultSet resultJoueur;
-		Requete requeteGetJoueur;
+		Query requeteGetJoueur;
 		HashMap<Integer,TypesPlayer> joueurs;
 		ArrayList<TypesTitle> palmares;
 		for (TypesStable ec : data.listStables()) {
-			r = new Requete(Requete.allEquipeByEcurie(ec.getId()), typeRequete.REQUETE);
+			r = new Query(Query.allTeamByStables(ec.getId()), typeRequete.QUERY);
 			rs = db.getData(r).getResultSet();
 			while(rs.next()) {
 				//Joueur
 				joueurs = new HashMap<>();
-				requeteGetJoueur = new Requete(Requete.allJoueurByEquipe(rs.getInt("Id_Equipe")), typeRequete.REQUETE);
+				requeteGetJoueur = new Query(Query.allPlayerByTeam(rs.getInt("Id_Equipe")), typeRequete.QUERY);
 				resultJoueur = db.getData(requeteGetJoueur).getResultSet();
 				while(resultJoueur.next()) {
 					BufferedImage bf1 = ImageIO.read(resultJoueur.getBinaryStream("photojoueur"));
@@ -130,7 +130,7 @@ public class mainThread {
 				ec.addTeam(equipe);
 			}
 			
-			r = new Requete(Requete.getTitreBuEcurie(ec.getId()), typeRequete.REQUETE);
+			r = new Query(Query.getTitleByStable(ec.getId()), typeRequete.QUERY);
 			rs = db.getData(r).getResultSet();
 			palmares = new ArrayList<>();
 			while(rs.next()) {
@@ -146,16 +146,16 @@ public class mainThread {
 		
 		/*On va maintenant initialiser la partie tournoi*/
 		//Tournoi
-		r = new Requete(Requete.getCalendrier(), typeRequete.REQUETE);
+		r = new Query(Query.getCalendar(), typeRequete.QUERY);
 		rs = db.getData(r).getResultSet();
 		HashMap<Integer, TypesTournament> calendrier = new HashMap<>();
 		TypesTournament tournoi;
-		Requete req;
+		Query req;
 		ResultSet res;
 		ArrayList<Integer> inscrits;
 		while(rs.next()) {
 			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
-			req = new Requete(Requete.getInscris(tournoi.getId()), typeRequete.REQUETE);
+			req = new Query(Query.getRegistered(tournoi.getId()), typeRequete.QUERY);
 			res = DatabaseAccess.getInstance().getData(req).getResultSet();
 			inscrits = new ArrayList<>();
 			while (res.next()) {

@@ -1,10 +1,10 @@
 package types;
 
-public enum TypesFame {
+public enum Renomme {
 LOCAL, NATIONAL, INTERNATIONAL;
 	
 	
-	public static TypesFame intToRenommee(int i) {
+	public static Renomme intToRenommee(int i) {
 		switch(i) {
 		case 1:return LOCAL;
 		case 2:return NATIONAL;
@@ -13,9 +13,9 @@ LOCAL, NATIONAL, INTERNATIONAL;
 		return null;
 
 	}
-
-	public static int FameToInt(TypesFame fame) {
-		return fame.ordinal()+1;
+	
+	public static int FameToInt(Renomme r) throws IllegalArgumentException{
+		return r.ordinal()+1;
 	}
 
 }

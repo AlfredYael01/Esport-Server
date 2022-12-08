@@ -41,7 +41,7 @@ public class QueueDatabase<T> {
 		queue.put(new SimpleEntry<>(id,s));
 	}
 	
-	public Entry<Integer, T> suivant(){
+	public Entry<Integer, T> next(){
 		try {
 			return queue.take();
 		} catch (InterruptedException e) {

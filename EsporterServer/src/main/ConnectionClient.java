@@ -8,10 +8,12 @@ import java.net.Socket;
 import java.sql.SQLException;
 
 import database.DatabaseAccess;
-import database.Requete;
-import database.Requete.typeRequete;
+import database.Query;
+import database.Query.typeRequete;
 import database.Result;
 import socket.ResponseObject;
+import types.TypesFame;
+import types.TypesGame;
 import types.TypesID;
 import types.TypesPermission;
 import types.TypesTournament;
@@ -41,13 +43,13 @@ public class ConnectionClient {
 	
 	public int login(String username, String password) {
 		try {
-			Result r = DatabaseAccess.getInstance().login(new Requete(Requete.Login(username, password), typeRequete.FONCTION));
+			Result r = DatabaseAccess.getInstance().login(new Query(Query.Login(username, password), typeRequete.FUNCTION));
 			if (r.isError()) {
 				System.out.println("Error");
 				return -1;
 			}
-			System.out.println(r.getEntier());
-			return r.getEntier();
+			System.out.println(r.getInteger());
+			return r.getInteger();
 		} catch (SQLException s) {
 			s.printStackTrace();
 			return -1;
@@ -62,10 +64,12 @@ public class ConnectionClient {
 	}
 	
 	public int ajouterTournoi(TypesTournament t) {
-		Requete req = new Requete(Requete.ajouterTournoi(t.getGame().ordinal(), t.getRegisterDate(), t.getName(), t.getFame().ordinal()), typeRequete.INSERT);
+		Query req = new Query(Query.addTournament(TypesGame.gameToInt(t.getGame()), t.getName(), TypesFame.FameToInt(t.getFame())), typeRequete.FUNCTION);
+		req.setDates(t.getRegisterDate());
+
 		try {
 			Result r = DatabaseAccess.getInstance().insertData(req);
-			int id = r.getEntier();
+			int id = r.getInteger();
 			t.setId(id);
 			mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, t);
 		} catch (InterruptedException e) {

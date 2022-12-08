@@ -17,7 +17,7 @@ public class DatabaseAccess {
 
 	private static DatabaseAccess instance;
 	private Connection conn;
-	private QueueDatabase<Requete> in;
+	private QueueDatabase<Query> in;
 	private QueueDatabase<Result> out;
 	private Thread t;
 	
@@ -39,20 +39,25 @@ public class DatabaseAccess {
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
-						Entry<Integer, Requete> entree = in.suivant();
+						Entry<Integer, Query> entry = in.next();
 						
-						if (entree!=null) {
-							int  id = entree.getKey();
-							Requete r = entree.getValue();
+						if (entry!=null) {
+							int  id = entry.getKey();
+							Query r = entry.getValue();
 							Result rs=new Result(null, 0, false);
 							switch (r.getType()) {
-							case FONCTION:
+							case FUNCTION:
 								try {
-									CallableStatement cstmt = conn.prepareCall(r.getRequete());
+									CallableStatement cstmt = conn.prepareCall(r.getQuery());
 									cstmt.registerOutParameter(1, Types.INTEGER);
+									if (r.getDates()!=null) {
+										for (int i=2;i<r.getDates().length+2;i++) {
+											cstmt.setDate(i, r.getDates()[i-2]);
+										}
+									}
 									cstmt.executeUpdate();
-									int entier = cstmt.getInt(1);
-									rs.setEntier(entier);
+									int integer = cstmt.getInt(1);
+									rs.setInteger(integer);
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -68,7 +73,7 @@ public class DatabaseAccess {
 							case PROCEDURE:
 								CallableStatement cstmt;
 								try {
-									cstmt = conn.prepareCall(r.getRequete());
+									cstmt = conn.prepareCall(r.getQuery());
 									cstmt.executeUpdate();
 								} catch (SQLException e2) {
 									e2.printStackTrace();
@@ -82,12 +87,12 @@ public class DatabaseAccess {
 								}
 								
 								break;
-							case REQUETE:
+							case QUERY:
 								
 								Statement st;
 								try {
 									st = conn.createStatement();
-									rs.setResultSet(st.executeQuery(r.getRequete()));
+									rs.setResultSet(st.executeQuery(r.getQuery()));
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -103,29 +108,29 @@ public class DatabaseAccess {
 								Statement st1;
 								try {
 									st1 = conn.createStatement();
-									rs.setResultSet(st1.executeQuery(r.getRequete()));
+									rs.setResultSet(st1.executeQuery(r.getQuery()));
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
 								}
 								break;
-							case INSERTJOUEUR:
+							case INSERTPLAYER:
 								
 								try {
-									System.out.println(r.getRequete());
-									CallableStatement insertJoueur = conn.prepareCall(r.getRequete());
-									insertJoueur.registerOutParameter(1, Types.INTEGER);
-									insertJoueur.setBinaryStream(2, r.getInputStream());
+									System.out.println(r.getQuery());
+									CallableStatement insertPlayer = conn.prepareCall(r.getQuery());
+									insertPlayer.registerOutParameter(1, Types.INTEGER);
+									insertPlayer.setBinaryStream(2, r.getInputStream());
 									int j = 3;
 									if (r.getDates()!=null) {
 										for (int i=0;i<r.getDates().length;i++) {
-											insertJoueur.setDate(i+j, r.getDates()[i]);
+											insertPlayer.setDate(i+j, r.getDates()[i]);
 										}
 										j+=r.getDates().length;
 									}
-									insertJoueur.executeUpdate();
-									int entier = insertJoueur.getInt(1);
-									rs.setEntier(entier);
+									insertPlayer.executeUpdate();
+									int entier = insertPlayer.getInt(1);
+									rs.setInteger(entier);
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -168,16 +173,16 @@ public class DatabaseAccess {
 		return instance;
 	}
 	
-	public Result getData(Requete requete) throws InterruptedException {
-		int id = in.put(requete);
+	public Result getData(Query query) throws InterruptedException {
+		int id = in.put(query);
 		Entry<Integer, Result> data;
 		data = out.get(id);
 		
 		return data.getValue();
 	}
 	
-	public Result insertData(Requete requete) throws InterruptedException {
-		int id = in.put(requete);
+	public Result insertData(Query query) throws InterruptedException {
+		int id = in.put(query);
 		Entry<Integer, Result> data;
 		data = out.get(id);
 		
@@ -187,17 +192,17 @@ public class DatabaseAccess {
 	
 
 	
-	public Result login(Requete requete) throws InterruptedException {
-		int id = in.put(requete);
+	public Result login(Query query) throws InterruptedException {
+		int id = in.put(query);
 		Entry<Integer, Result> data;
 		data = out.get(id);
-		System.out.println(data.getValue().getEntier());
+		System.out.println(data.getValue().getInteger());
 		return data.getValue();
 	}
 	
-	public TypesStable getEcurie(Requete requete) throws InterruptedException {
+	public TypesStable getEcurie(Query query) throws InterruptedException {
 		TypesStable ecurie = new TypesStable(null, null, null, 0);
-		int id = in.put(requete);
+		int id = in.put(query);
 		Entry<Integer, Result> data;
 		data = out.get(id);
 		return ecurie;

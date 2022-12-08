@@ -5,12 +5,12 @@ import java.sql.ResultSet;
 public class Result {
 
 	private ResultSet r;
-	private int Entier;
+	private int integer;
 	private boolean error;
 	
 	public Result(ResultSet r, int entier, boolean error) {
 		this.r = r;
-		Entier = entier;
+		integer = entier;
 		this.error = error;
 	}
 	
@@ -22,16 +22,16 @@ public class Result {
 		return error;
 	}
 	
-	public int getEntier() {
-		return Entier;
+	public int getInteger() {
+		return integer;
 	}
 	
 	public ResultSet getResultSet() {
 		return r;
 	}
 	
-	public void setEntier(int entier) {
-		Entier = entier;
+	public void setInteger(int entier) {
+		integer = entier;
 	}
 	
 	public void setResultSet(ResultSet r) {
