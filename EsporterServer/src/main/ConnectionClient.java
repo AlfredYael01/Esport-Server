@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import database.DatabaseAccess;
 import database.Query;
 import database.Query.typeRequete;
-import model.socket.ResponseObject;
+import socket.ResponseObject;
 import database.Result;
 import types.TypesFame;
 import types.TypesGame;

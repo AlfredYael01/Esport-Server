@@ -12,12 +12,12 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
+import data.Data;
 import database.DatabaseAccess;
 import database.Query;
 import database.Query.typeRequete;
-import model.data.Data;
-import model.socket.Response;
-import model.socket.ResponseObject;
+import socket.Response;
+import socket.ResponseObject;
 import types.TypesStable;
 import types.TypesTeam;
 import types.TypesImage;
@@ -44,14 +44,14 @@ public class mainThread {
 			data = new Data();
 			initializeApp();
 			ServerSocket server = new ServerSocket(80);
-			System.out.println("Serv démarré");
+			System.out.println("Serv dï¿½marrï¿½");
 			while(running) {
 				System.out.println("En attente d'une connexion");
 				Socket s = server.accept();
 				ConnectionClient c = new ConnectionClient(s);
 				ajouterClient(c);
 
-				System.out.println("Nouvelle connexion accepté");
+				System.out.println("Nouvelle connexion acceptï¿½");
 			}
 			for (ConnectionClient c : tabClient) {
 				try {

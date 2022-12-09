@@ -17,14 +17,14 @@ import java.util.Timer;
 
 import javax.imageio.ImageIO;
 
+import data.Data;
 import database.DatabaseAccess;
 import database.Query;
 import database.Query.typeRequete;
-import model.data.Data;
-import model.socket.Command;
-import model.socket.CommandName;
-import model.socket.Response;
-import model.socket.ResponseObject;
+import socket.Command;
+import socket.CommandName;
+import socket.Response;
+import socket.ResponseObject;
 import database.Result;
 import types.TypesStable;
 import types.TypesInteger;

@@ -1,4 +1,4 @@
-package model.socket;
+package socket;
 
 import java.io.Serializable;
 
