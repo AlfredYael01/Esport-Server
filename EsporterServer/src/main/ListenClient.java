@@ -341,7 +341,7 @@ public class ListenClient implements Runnable{
 	}
 	
 	private void error(String s) {
-		ResponseObject r = new ResponseObject(Response.Error, null, s);
+		ResponseObject r = new ResponseObject(Response.ERROR, null, s);
 		client.send(r);
 	}
 	

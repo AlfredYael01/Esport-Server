@@ -180,13 +180,13 @@ public class mainThread {
 		case PLAYER:
 			TypesPlayer joueur = (TypesPlayer)data;
 			this.data.getStables().get(joueur.getIdStable()).getTeams().get(joueur.getIdTeam()).modifyPlayer(joueur);
-			r = new ResponseObject(Response.UPDATE_JOUEUR, m, null);
+			r = new ResponseObject(Response.UPDATE_PLAYER, m, null);
 			sendAll(r);
 			break;
 		case TOURNAMENT:
 			TypesTournament tournoi = (TypesTournament)data;
 			this.data.getCalendar().put(tournoi.getId(), tournoi);
-			r = new ResponseObject(Response.UPDATE_TOURNOI, m, null);
+			r = new ResponseObject(Response.UPDATE_TOURNAMENT, m, null);
 			System.out.println();
 			sendAll(r);
 			break;
