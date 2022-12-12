@@ -141,8 +141,33 @@ public class DatabaseAccess {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
+							break;
+						case MODIFYPLAYER:
 							
+							try {
+								System.out.println(r.getQuery());
+								CallableStatement insertPlayer = conn.prepareCall(r.getQuery());
+								insertPlayer.setBinaryStream(1, r.getInputStream());
+								int j = 2;
+								if (r.getDates()!=null) {
+									for (int i=0;i<r.getDates().length;i++) {
+										insertPlayer.setDate(i+j, r.getDates()[i]);
+									}
+									j+=r.getDates().length;
+								}
+								insertPlayer.executeUpdate();
+							} catch (SQLException e1) {
+								e1.printStackTrace();
+								rs.setError(true);
 							}
+							try {
+								out.put(rs, id);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						
+						}
 							
 						}
 					}

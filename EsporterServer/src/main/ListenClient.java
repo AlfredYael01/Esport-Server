@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Timer;
 
 import javax.imageio.ImageIO;
@@ -86,6 +87,14 @@ public class ListenClient implements Runnable{
 					}
 					TypesRegisterTeam equipe = (TypesRegisterTeam) c.getInfoByID(TypesID.TEAM);
 					ajouterEquipe(equipe);
+					break;
+				case MODIFY_TEAM:
+					if(client.getRole()!=TypesPermission.STABLE) {
+						errorPermission();
+						break;
+					}
+					TypesTeam team = (TypesTeam) c.getInfoByID(TypesID.TEAM);
+					modifyTeam(team);
 					break;
 				case AJOUTER_TOURNOI:
 					client.ajouterTournoi((TypesTournament)c.getInfoByID(TypesID.TOURNAMENT));
@@ -195,6 +204,37 @@ public class ListenClient implements Runnable{
 			e.printStackTrace();
 		}
 		
+		
+	}
+	
+	public void modifyTeam(TypesTeam team) {
+		Iterator<TypesPlayer> ite = team.getPlayers().values().iterator();
+		while(ite.hasNext()) {
+			TypesPlayer player = ite.next();
+			Query r = new Query(Query.modifyPlayer(player.getFirstName(), player.getName(), player.getId()),typeRequete.MODIFYPLAYER);
+			r.setDates(player.getBirthDate(),player.getContractStartDate(),player.getContractEndDate());
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+            try {
+				ImageIO.write(player.getImage().getImage(), "png", os);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            InputStream is = new ByteArrayInputStream(os.toByteArray());
+            r.setInputStream(is);
+            try {
+				Result res = DatabaseAccess.getInstance().getData(r);
+				if (res.isError()) {
+					System.out.println("Error on insert");
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		mainThread.getInstance().miseAJourData(TypesID.TEAM, team);
 		
 	}
 	

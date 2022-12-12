@@ -193,7 +193,7 @@ public class mainThread {
 		case TEAM:
 			TypesTeam equipe = (TypesTeam)data;
 			this.data.getStables().get(equipe.getStable().getId()).getTeams().put(equipe.getId(), equipe);
-			r = new ResponseObject(Response.UPDATE_EQUIPE, m, null);
+			r = new ResponseObject(Response.UPDATE_TEAM, m, null);
 			sendAll(r);
 			break;
 		} 

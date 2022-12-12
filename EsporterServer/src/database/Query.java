@@ -8,7 +8,7 @@ import types.TypesRegisterPlayer;
 
 public class Query {
 
-	public enum typeRequete{FUNCTION, QUERY, PROCEDURE, INSERT, INSERTPLAYER}
+	public enum typeRequete{FUNCTION, QUERY, PROCEDURE, INSERT, INSERTPLAYER, MODIFYPLAYER}
 	
 	
 	private String query;
@@ -137,8 +137,8 @@ public class Query {
 		return "delete from cmf4263a.Equipe where id_equipe = "+id;
 	}
 	
-	public static String modifyPlayer(String prenom, String nom, int Id_Equipe) {
-		return "{call cmf4263a.modifyJoueur('"+nom+"','"+prenom+"',?,?,?,?"+Id_Equipe+")}";
+	public static String modifyPlayer(String prenom, String nom, int id_Utilisateur) {
+		return "{call cmf4263a.modifierjoueur('"+nom+"','"+prenom+"',?,?,?,?,"+id_Utilisateur+")}";
 	}
 	public static String removeTournament(int Id_Tournoi) {
 		return "{call cmf4362a.SupprimerTournoi("+Id_Tournoi+")}"; 
