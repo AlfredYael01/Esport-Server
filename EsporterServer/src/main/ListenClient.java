@@ -80,7 +80,7 @@ public class ListenClient implements Runnable{
 				case LOGOUT : 
 					logout();
 					break;
-				case AJOUTER_EQUIPE:
+				case ADD_TEAM:
 					if(client.getRole()!=TypesPermission.STABLE) {
 						errorPermission();
 						break;
@@ -96,19 +96,19 @@ public class ListenClient implements Runnable{
 					TypesTeam team = (TypesTeam) c.getInfoByID(TypesID.TEAM);
 					modifyTeam(team);
 					break;
-				case AJOUTER_TOURNOI:
+				case ADD_TOURNAMENT:
 					client.ajouterTournoi((TypesTournament)c.getInfoByID(TypesID.TOURNAMENT));
 					break;
-				case INSCRIPTION_TOURNOI:
+				case REGISTER_TOURNAMENT:
 					inscriptionTournoi(((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger(), ((TypesInteger)c.getInfoByID(TypesID.PLAYER)).getInteger());
 					break;
-				case DESINSCRIPTION_TOURNOI:
+				case UNREGISTER_TOURNAMENT:
 					desinscriptionTournoi(((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger(), ((TypesInteger)c.getInfoByID(TypesID.PLAYER)).getInteger(), ((TypesInteger)c.getInfoByID(TypesID.GAME)).getInteger());
 					break;
-				case VOIR_CALENDRIER:
+				case CALENDAR:
 					
 					break;
-				case VOIR_ECURIE:
+				case STABLE:
 					break;
 				default:
 			}
@@ -118,9 +118,9 @@ public class ListenClient implements Runnable{
 				case LOGIN : 
 					login(c);
 					break;
-				case VOIR_CALENDRIER:
+				case CALENDAR:
 					break;
-				case VOIR_ECURIE:
+				case STABLE:
 					break;
 				case INIT:
 					
