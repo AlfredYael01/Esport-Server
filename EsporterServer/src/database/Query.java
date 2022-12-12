@@ -141,7 +141,7 @@ public class Query {
 		return "{call cmf4263a.modifierjoueur('"+nom+"','"+prenom+"',?,?,?,?,"+id_Utilisateur+")}";
 	}
 	public static String removeTournament(int Id_Tournoi) {
-		return "{call cmf4362a.SupprimerTournoi("+Id_Tournoi+")}"; 
+		return "delete from cmf4263a.Tournoi where id_tournois = "+Id_Tournoi; 
 	}
 	/*
 	public static String VoirInfosEcurie4 (int IdEquipe) {

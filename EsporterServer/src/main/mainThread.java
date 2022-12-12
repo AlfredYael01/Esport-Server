@@ -21,6 +21,7 @@ import socket.ResponseObject;
 import types.TypesStable;
 import types.TypesTeam;
 import types.TypesImage;
+import types.TypesInteger;
 import types.TypesID;
 import types.Types;
 import types.TypesGame;
@@ -168,6 +169,23 @@ public class mainThread {
 			//Poule
 				//Rencontre
 		//Classement
+	}
+	
+	
+	public synchronized void deleteData(TypesID info, Types data) {
+		System.out.println("DELETE DATA");
+		ResponseObject r;
+		HashMap<TypesID, Types> m = new HashMap<>();
+		switch (info) {
+		case TOURNAMENT:
+			TypesInteger t = (TypesInteger)data;
+			m.put(TypesID.TOURNAMENT, new TypesInteger(t.getInteger()));
+			this.data.getCalendar().remove(t.getInteger());
+			r = new ResponseObject(Response.DELETE_TOURNAMENT, m, null);
+			sendAll(r);
+			break;
+		}
+		
 	}
 	
 	
