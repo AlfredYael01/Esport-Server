@@ -26,6 +26,7 @@ import types.TypesID;
 import types.Types;
 import types.TypesGame;
 import types.TypesPlayer;
+import types.TypesPool;
 import types.TypesFame;
 import types.TypesTitle;
 import types.TypesTournament;
@@ -74,7 +75,7 @@ public class mainThread {
 			e1.printStackTrace();
 		} catch (InterruptedException e2) {
 			// TODO Auto-generated catch block
-			//e2.printStackTrace();
+			e2.printStackTrace();
 		}
 	}
 
@@ -155,6 +156,14 @@ public class mainThread {
 		ResultSet res;
 		ArrayList<Integer> inscrits;
 		while(rs.next()) {
+			
+			
+			
+			
+			
+			
+			
+			
 			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 			req = new Query(Query.getRegistered(tournoi.getId()), typeRequete.QUERY);
 			res = DatabaseAccess.getInstance().getData(req).getResultSet();
@@ -163,12 +172,37 @@ public class mainThread {
 				inscrits.add(res.getInt("id_equipe"));
 			}
 			tournoi.setRegistered(inscrits);
+			
+			tournoi.setPool(getPool(tournoi.getId(), TypesGame.gameToInt(tournoi.getGame())));
+			
+			
+			
+			
 			calendrier.put(rs.getInt("id_tournois"), tournoi);
 		}
 		this.data.setCalendar(calendrier);
 			//Poule
 				//Rencontre
 		//Classement
+	}
+	
+	private ArrayList<TypesPool> getPool(int idTournoi, int idJeux) throws InterruptedException, SQLException {
+		ArrayList<TypesPool> pools = new ArrayList<>();
+		
+		Query pool = new Query(Query.getPool(idTournoi, idJeux), typeRequete.QUERY);
+		ResultSet allPool = DatabaseAccess.getInstance().getData(pool).getResultSet();
+		
+		while (allPool.next()) {
+			Query equipe = new Query(Query.getEquipeParPool(allPool.getInt("id_poule"), idTournoi, idJeux), typeRequete.QUERY);
+			ResultSet Equipe = DatabaseAccess.getInstance().getData(equipe).getResultSet();
+			HashMap<TypesTeam, Integer> classement = new HashMap<>();
+			while (Equipe.next()) {
+				classement.put(this.data.getStables().get(Equipe.getInt("id_utilisateur")).getTeams().get(Equipe.getInt("id_equipe")), Equipe.getInt("point"));
+			}
+			
+			pools.add(new TypesPool(allPool.getInt("id_Poule"), idTournoi, classement, null));
+		}
+		return pools;
 	}
 	
 	

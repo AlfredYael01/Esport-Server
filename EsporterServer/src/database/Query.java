@@ -143,6 +143,16 @@ public class Query {
 	public static String removeTournament(int Id_Tournoi) {
 		return "delete from cmf4263a.Tournoi where id_tournois = "+Id_Tournoi; 
 	}
+	
+	
+	public static String getPool(int tournementId, int gameId) {
+		return "select * from cmf4263a.Poule where id_tournois = "+tournementId+" and id_jeux = "+gameId+" order by id_poule";
+	}
+	
+	public static String getEquipeParPool(int pool, int tournament, int game) {
+		return String.format("select affilier.id_equipe, affilier.id_poule, point, equipe.id_utilisateur  from cmf4263a.affilier, cmf4263a.equipe where equipe.id_equipe = affilier.id_equipe and id_poule = %d and affilier.id_tournois = %d and affilier.id_jeux = %d", pool, tournament, game);
+	}
+	
 	/*
 	public static String VoirInfosEcurie4 (int IdEquipe) {
 

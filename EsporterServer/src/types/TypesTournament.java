@@ -60,6 +60,10 @@ public class TypesTournament implements Types, Serializable, Comparable<TypesTou
 	public int hashCode() {
 		return Objects.hash(registerDate, id, game, name, fame);
 	}
+	
+	public void setPool(ArrayList<TypesPool> pool) {
+		this.pool = pool;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -87,6 +91,14 @@ public class TypesTournament implements Types, Serializable, Comparable<TypesTou
 	
 	public void unregisterTeam(int team) {
 		registered.remove(Integer.valueOf(team));
+	}
+	
+	public int getNbInscrit() {
+		return registered.size();
+	}
+	
+	public boolean isFull() {
+		return registered.size()==16;
 	}
 	
 	
