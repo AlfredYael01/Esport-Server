@@ -73,6 +73,10 @@ public class Query {
 		return "select id_equipe from cmf4263a.Utilisateur where Utilisateur.Id_Utilisateur = "+id;
 	}
 	
+	public static String getStableByTeam(int id) {
+		return "Select equipe.id_utilisateur from cmf4263a.Equipe where Equipe.id_equipe = "+id; 
+	}
+	
 	public static String getTeamGame(int id) {
 		return "select id_jeux from cmf4263a.Equipe where id_equipe= "+id;
 	}

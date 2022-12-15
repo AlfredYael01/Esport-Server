@@ -246,7 +246,7 @@ public class ListenClient implements Runnable{
 		try {
 			Result r = DatabaseAccess.getInstance().getData(req);
 			if (r.isError()) {
-				error("Le tournoi ne peut pas etre supprimé");
+				error("Le tournoi ne peut pas etre supprimï¿½");
 				return;
 			}
 			mainThread.getInstance().deleteData(TypesID.TOURNAMENT, new TypesInteger(t));
@@ -399,9 +399,14 @@ private void login(Command c) {
 				Result r = DatabaseAccess.getInstance().getData(new Query(Query.getTeamByPlayer(result), typeRequete.QUERY));
 				ResultSet resultset = r.getResultSet();
 				resultset.next();
+				int idTeam = resultset.getInt("id_equipe");
+				r = DatabaseAccess.getInstance().getData(new Query(Query.getStableByTeam(idTeam), typeRequete.QUERY));
+				resultset = r.getResultSet();
+				resultset.next();
+				
 				BufferedImage bf = ImageIO.read(rs.getBinaryStream("photojoueur"));
 				TypesImage im = new TypesImage(bf, "png");
-				m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_equipe")));
+				m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_utilisateur")));
 				break;
 			case 4:
 				m.put(TypesID.PERMISSION, TypesPermission.STABLE);
