@@ -18,15 +18,15 @@ import java.util.Timer;
 
 import javax.imageio.ImageIO;
 
-import data.Data;
-import database.DatabaseAccess;
-import database.Query;
-import database.Query.typeRequete;
-import socket.Command;
-import socket.CommandName;
-import socket.Response;
-import socket.ResponseObject;
-import database.Result;
+import model.data.Data;
+import model.database.DatabaseAccess;
+import model.database.Query;
+import model.database.Result;
+import model.database.Query.typeRequete;
+import model.socket.Command;
+import model.socket.CommandName;
+import model.socket.Response;
+import model.socket.ResponseObject;
 import types.TypesStable;
 import types.TypesInteger;
 import types.TypesTeam;

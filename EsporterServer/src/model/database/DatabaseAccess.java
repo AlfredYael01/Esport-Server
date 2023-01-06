@@ -1,4 +1,4 @@
-package database;
+package model.database;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;

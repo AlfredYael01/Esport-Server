@@ -1,4 +1,4 @@
-package database;
+package model.database;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.HashMap;

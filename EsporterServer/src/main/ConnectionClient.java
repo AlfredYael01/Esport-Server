@@ -7,11 +7,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 
-import database.DatabaseAccess;
-import database.Query;
-import database.Query.typeRequete;
-import socket.ResponseObject;
-import database.Result;
+import model.database.DatabaseAccess;
+import model.database.Query;
+import model.database.Result;
+import model.database.Query.typeRequete;
+import model.socket.ResponseObject;
 import types.TypesFame;
 import types.TypesGame;
 import types.TypesID;

@@ -1,4 +1,4 @@
-package database;
+package model.database;
 
 import java.io.InputStream;
 import java.sql.Blob;
