@@ -136,7 +136,7 @@ public class mainThread {
 				while(resultJoueur.next()) {
 					BufferedImage bf1 = ImageIO.read(resultJoueur.getBinaryStream("photojoueur"));
 					TypesImage im1 = new TypesImage(bf1, "png");
-					joueur = new TypesPlayer(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getDate("datenaissancejoueur"), resultJoueur.getDate("datecontratjoueur"), resultJoueur.getDate("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId());
+					joueur = new TypesPlayer(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getTimestamp("datenaissancejoueur"), resultJoueur.getTimestamp("datecontratjoueur"), resultJoueur.getTimestamp("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId());
 					joueurs.put(joueur.getId(), joueur);
 					System.out.println("\tJoueur "+joueur.getFirstName());
 				}
@@ -150,7 +150,7 @@ public class mainThread {
 			palmares = new ArrayList<>();
 			while(rs.next()) {
 				//Titre
-				palmares.add(new TypesTitle(rs.getString("libelle"),rs.getDate("dateobtention")));
+				palmares.add(new TypesTitle(rs.getString("libelle"),rs.getTimestamp("dateobtention")));
 				
 			}
 			ec.setTitles(palmares);
@@ -171,7 +171,7 @@ public class mainThread {
 		ArrayList<Integer> inscrits;
 		while(rs.next()) {
 			
-			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			tournoi = new TypesTournament(rs.getTimestamp("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 			System.out.println("Tournoi : "+tournoi.getName());
 			req = new Query(Query.getRegistered(tournoi.getId()), typeRequete.QUERY);
 			res = DatabaseAccess.getInstance().getData(req).getResultSet();
@@ -182,7 +182,7 @@ public class mainThread {
 			System.out.println("\tInscrits OK");
 			tournoi.setRegistered(inscrits);
 			
-			tournoi.setPool(getPool(tournoi.getId(), TypesGame.gameToInt(tournoi.getGame())));
+			tournoi.setPool(getPool(tournoi, TypesGame.gameToInt(tournoi.getGame())));
 			System.out.println("\tPool OK");
 
 			calendrier.put(rs.getInt("id_tournois"), tournoi);
@@ -210,14 +210,14 @@ public class mainThread {
 		
 	}
 	
-	private ArrayList<TypesPool> getPool(int idTournoi, int idJeux) throws InterruptedException, SQLException {
+	private ArrayList<TypesPool> getPool(TypesTournament tournoi, int idJeux) throws InterruptedException, SQLException {
 		ArrayList<TypesPool> pools = new ArrayList<>();
 		
-		Query pool = new Query(Query.getPool(idTournoi, idJeux), typeRequete.QUERY);
+		Query pool = new Query(Query.getPool(tournoi.getId(), idJeux), typeRequete.QUERY);
 		ResultSet allPool = DatabaseAccess.getInstance().getData(pool).getResultSet();
 		
 		while (allPool.next()) {
-			Query equipe = new Query(Query.getEquipeParPool(allPool.getInt("id_poule"), idTournoi, idJeux), typeRequete.QUERY);
+			Query equipe = new Query(Query.getEquipeParPool(allPool.getInt("id_poule"), tournoi.getId(), idJeux), typeRequete.QUERY);
 			ResultSet Equipe = DatabaseAccess.getInstance().getData(equipe).getResultSet();
 			HashMap<TypesTeam, Integer> classement = new HashMap<>();
 			while (Equipe.next()) {
@@ -225,21 +225,21 @@ public class mainThread {
 			}
 			ArrayList<TypesMatch> matchsList = new ArrayList<>();
 			//Match des poules
-			if(classement.size()==16) {
+			if(tournoi.isFull()) {
 			
-				ResultSet allMatch = DatabaseAccess.getInstance().getData(new Query(Query.getMatchs(idTournoi, allPool.getInt("id_poule"), idJeux), typeRequete.QUERY)).getResultSet();
+				ResultSet allMatch = DatabaseAccess.getInstance().getData(new Query(Query.getMatchs(tournoi.getId(), allPool.getInt("id_poule"), idJeux), typeRequete.QUERY)).getResultSet();
 				while(allMatch.next()) {
 					int gagnant = 0;
 					if(allMatch.getInt("Gagnant")!=0) {
 						gagnant = allMatch.getInt("Gagnant");
 					}
-					TypesMatch match = new TypesMatch(allMatch.getDate("DateMatch"), allMatch.getInt("id_equipeA"), allMatch.getInt("id_equipeB"), gagnant, allMatch.getInt("nombrePointEquipe1"), allMatch.getInt("nombrePointEquipe2"));
+					TypesMatch match = new TypesMatch(allMatch.getTimestamp("DateMatch"), allMatch.getInt("id_equipeA"), allMatch.getInt("id_equipeB"), gagnant, allMatch.getInt("nombrePointEquipe1"), allMatch.getInt("nombrePointEquipe2"));
 					matchsList.add(match);
 				}
-				System.out.println("\tMATCH OK");
+				System.out.println("\tMatch pool "+allPool.getInt("id_poule")+" OK");
 			}
 
-			pools.add(new TypesPool(allPool.getInt("id_Poule"), idTournoi, classement, matchsList));
+			pools.add(new TypesPool(allPool.getInt("id_Poule"), tournoi.getId(), classement, matchsList));
 		}
 		return pools;
 	}

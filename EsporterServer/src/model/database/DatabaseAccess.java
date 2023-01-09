@@ -52,7 +52,7 @@ public class DatabaseAccess {
 									cstmt.registerOutParameter(1, Types.INTEGER);
 									if (r.getDates()!=null) {
 										for (int i=2;i<r.getDates().length+2;i++) {
-											cstmt.setDate(i, r.getDates()[i-2]);
+											cstmt.setTimestamp(i, r.getDates()[i-2]);
 										}
 									}
 									cstmt.executeUpdate();
@@ -124,7 +124,7 @@ public class DatabaseAccess {
 									int j = 3;
 									if (r.getDates()!=null) {
 										for (int i=0;i<r.getDates().length;i++) {
-											insertPlayer.setDate(i+j, r.getDates()[i]);
+											insertPlayer.setTimestamp(i+j, r.getDates()[i]);
 										}
 										j+=r.getDates().length;
 									}
@@ -151,7 +151,7 @@ public class DatabaseAccess {
 								int j = 2;
 								if (r.getDates()!=null) {
 									for (int i=0;i<r.getDates().length;i++) {
-										insertPlayer.setDate(i+j, r.getDates()[i]);
+										insertPlayer.setTimestamp(i+j, r.getDates()[i]);
 									}
 									j+=r.getDates().length;
 								}

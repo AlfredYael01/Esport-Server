@@ -283,7 +283,7 @@ public class ListenClient implements Runnable{
 			res = DatabaseAccess.getInstance().getData(r);
 			ResultSet rs = res.getResultSet();
 			rs.next();
-			tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+			tournoi = new TypesTournament(rs.getTimestamp("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 
 			Query requete = new Query(Query.getTeamGame(id_equipe), typeRequete.QUERY);
 			ResultSet resultset = DatabaseAccess.getInstance().getData(requete).getResultSet();
@@ -310,6 +310,9 @@ public class ListenClient implements Runnable{
 
 
 		tournoi.registerTeam(id_equipe);
+		if(tournoi.isFull()) {
+			//on charge le tournoi
+		}
 
 		//Il manque le get Poule
 
@@ -342,7 +345,7 @@ private void desinscriptionTournoi(int id_Tournoi, int id_Joueur, int id_Jeu) {
 		res = DatabaseAccess.getInstance().getData(r);
 		ResultSet rs = res.getResultSet();
 		rs.next();
-		tournoi = new TypesTournament(rs.getDate("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
+		tournoi = new TypesTournament(rs.getTimestamp("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
 
 
 
@@ -414,7 +417,7 @@ private void login(Command c) {
 				
 				BufferedImage bf = ImageIO.read(rs.getBinaryStream("photojoueur"));
 				TypesImage im = new TypesImage(bf, "png");
-				m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getDate("datenaissancejoueur"), rs.getDate("datecontratjoueur"), rs.getDate("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_utilisateur")));
+				m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getTimestamp("datenaissancejoueur"), rs.getTimestamp("datecontratjoueur"), rs.getTimestamp("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_utilisateur")));
 				break;
 			case 4:
 				m.put(TypesID.PERMISSION, TypesPermission.STABLE);

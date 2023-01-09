@@ -3,6 +3,7 @@ package model.database;
 import java.io.InputStream;
 import java.sql.Blob;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import types.TypesRegisterPlayer;
 
@@ -14,7 +15,7 @@ public class Query {
 	private String query;
 	private typeRequete type;
 	private InputStream inputStream;
-	private Date[] dates = null;
+	private Timestamp[] dates = null;
 	private int[] integers = null;
 	public Query(String requete, typeRequete type) {
 		this.query = requete;
@@ -30,11 +31,11 @@ public class Query {
 	}
 	
 	
-	public void setDates(Date... dates) {
+	public void setDates(Timestamp... dates) {
 		this.dates = dates;
 	}
 	
-	public Date[] getDates() {
+	public Timestamp[] getDates() {
 		return dates;
 	}
 	
