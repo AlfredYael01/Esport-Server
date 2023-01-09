@@ -165,6 +165,18 @@ public class Query {
 	}*/
 	
 	
+	public static String getMatchs(int idTournament, int idPool, int idJeux) {
+		return String.format("select id_equipeA, id_equipeB, nombrePointEquipe1, nombrePointEquipe2, Gagnant, DateMatch,id_rencontre from cmf4263a.rencontre where id_tournois = %d and id_poule = %d and id_jeux = %d",idTournament, idPool, idJeux);
+	}
+	
+	public static String getAllRanking() {
+		return ("select id_classement, id_jeux from cmf4263a.classement");
+	}
+	
+	public static String getRankingByUserByGame(int id_user, int id_classement) {
+		return String.format("select nombrepoint from cmf4263a.appartenir where id_utilisateur = %d and id_classement = %d", id_user, id_classement);
+	}
+	
 	
 	
 	
