@@ -113,6 +113,9 @@ public class ListenClient implements Runnable{
 			case DELETE_TOURNAMENT:
 				deleteTournament(((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger());
 				break;
+			case MODIFY_TOURNAMENT:
+				modifyTournament(((TypesTournament)c.getInfoByID(TypesID.TOURNAMENT)));
+				break;
 			default:
 			}
 
@@ -138,6 +141,11 @@ public class ListenClient implements Runnable{
 				errorPermission();
 			}
 		}
+	}
+	
+	
+	private void modifyTournament(TypesTournament t) {
+		mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, t);
 	}
 
 	private void ajouterEquipe(TypesRegisterTeam equipe) {
@@ -198,10 +206,10 @@ public class ListenClient implements Runnable{
 	private void erreurAjoutEquipe(int idEquipe) {
 		try {
 			Query r = new Query(Query.removePlayerByTeam(idEquipe),typeRequete.QUERY);
-			Result res = DatabaseAccess.getInstance().getData(r);
+			DatabaseAccess.getInstance().getData(r);
 
 			r = new Query(Query.removeTeam(idEquipe),typeRequete.QUERY);
-			res = DatabaseAccess.getInstance().getData(r);
+			DatabaseAccess.getInstance().getData(r);
 		} catch (InterruptedException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
