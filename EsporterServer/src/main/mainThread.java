@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 
@@ -58,6 +59,16 @@ public class mainThread {
 
 				System.out.println("Nouvelle connexion accept�");
 			}
+			//Stop DB worker
+			try {
+				DatabaseAccess.getInstance().getTimerCheckAlive().cancel();
+				DatabaseAccess.getInstance().stopThread();
+				DatabaseAccess.getInstance().getConn().close();
+			} catch(InterruptedException ie) {
+				ie.printStackTrace();
+			}
+			
+			//Stop all client
 			for (ConnectionClient c : tabClient) {
 				try {
 					c.getSocket().close();
@@ -67,6 +78,7 @@ public class mainThread {
 					e.printStackTrace();
 				}
 			}
+			//Stop Server
 			try {
 				server.close();
 			} catch (IOException e) {

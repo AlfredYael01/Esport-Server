@@ -8,8 +8,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import main.mainThread;
+import oracle.jdbc.pool.OracleDataSource;
+import oracle.sql.DATE;
 import types.TypesStable;
 
 
@@ -20,17 +29,43 @@ public class DatabaseAccess {
 	private QueueDatabase<Query> in;
 	private QueueDatabase<Result> out;
 	private Thread t;
+
+	private boolean run = true;
+	private Timer timerCheckAlive;
+	private OracleDataSource dataSource;
 	
 	private DatabaseAccess() throws SQLException {
 		in = new QueueDatabase<>(this);
 		out = new QueueDatabase<>(this);
 		connexion();
 		DatabaseAccess database = this;	
+		
+		
+		
+	
+		
+		TimerTask tt = new TimerTask() {
+			
+			@Override
+			public void run() {
+				pingConnexion();
+				
+			}
+		};
+		
+		//Ping the db to know if the connection is stil active
+		timerCheckAlive = new Timer();
+		timerCheckAlive.scheduleAtFixedRate(tt, 120000, 60000);;
+		
+		
+		
+	    
+	    
 		t = new Thread(new Runnable() {
 		
 			@Override
 			public void run() {
-				while(true) {
+				while(run) {
 					synchronized (database) {
 
 						if (in.getNbElement()==0)
@@ -55,7 +90,9 @@ public class DatabaseAccess {
 											cstmt.setTimestamp(i, r.getDates()[i-2]);
 										}
 									}
-									cstmt.executeUpdate();
+									synchronized (instance) {
+										cstmt.executeUpdate();
+									}
 									int integer = cstmt.getInt(1);
 									rs.setInteger(integer);
 								} catch (SQLException e1) {
@@ -74,7 +111,9 @@ public class DatabaseAccess {
 								CallableStatement cstmt;
 								try {
 									cstmt = conn.prepareCall(r.getQuery());
-									cstmt.executeUpdate();
+									synchronized (instance) {
+										cstmt.executeUpdate();
+									}
 								} catch (SQLException e2) {
 									e2.printStackTrace();
 									rs.setError(true);
@@ -92,7 +131,9 @@ public class DatabaseAccess {
 								Statement st;
 								try {
 									st = conn.createStatement();
-									rs.setResultSet(st.executeQuery(r.getQuery()));
+									synchronized (instance) {
+										rs.setResultSet(st.executeQuery(r.getQuery()));
+									}
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -108,7 +149,9 @@ public class DatabaseAccess {
 								Statement st1;
 								try {
 									st1 = conn.createStatement();
-									rs.setResultSet(st1.executeQuery(r.getQuery()));
+									synchronized (instance) {
+										rs.setResultSet(st1.executeQuery(r.getQuery()));
+									}
 								} catch (SQLException e1) {
 									e1.printStackTrace();
 									rs.setError(true);
@@ -128,7 +171,9 @@ public class DatabaseAccess {
 										}
 										j+=r.getDates().length;
 									}
-									insertPlayer.executeUpdate();
+									synchronized (instance) {
+										insertPlayer.executeUpdate();
+									}
 									int entier = insertPlayer.getInt(1);
 									rs.setInteger(entier);
 								} catch (SQLException e1) {
@@ -145,7 +190,6 @@ public class DatabaseAccess {
 						case MODIFYPLAYER:
 							
 							try {
-								System.out.println(r.getQuery());
 								CallableStatement insertPlayer = conn.prepareCall(r.getQuery());
 								insertPlayer.setBinaryStream(1, r.getInputStream());
 								int j = 2;
@@ -155,7 +199,9 @@ public class DatabaseAccess {
 									}
 									j+=r.getDates().length;
 								}
-								insertPlayer.executeUpdate();
+								synchronized (instance) {
+									insertPlayer.executeUpdate();
+								}
 							} catch (SQLException e1) {
 								e1.printStackTrace();
 								rs.setError(true);
@@ -172,6 +218,7 @@ public class DatabaseAccess {
 						}
 					}
 				}
+				
 			}
 		});
 		t.setDaemon(true);
@@ -180,15 +227,44 @@ public class DatabaseAccess {
 	}
 	
 	
+	
+	
+	private void pingConnexion() {
+		synchronized (instance) {
+			try {
+				if(!this.conn.isValid(10)) {
+					System.out.println("Reconnecting");
+					reconnexion();
+				} else {
+					System.out.println("DB is alive");
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	private void connexion() throws SQLException {
-        String login = "MRC4302A";
-        String passw = "$iutinfo";
-        String connectString = "jdbc:oracle:thin:@telline.univ-tlse3.fr:1521:etupre";
+		dataSource = new OracleDataSource();
+		dataSource.setURL("jdbc:oracle:thin:@telline.univ-tlse3.fr:1521:etupre");
+		dataSource.setUser("MRC4302A");
+		dataSource.setPassword("$iutinfo");
+        //String login = "MRC4302A";
+        //String passw = "$iutinfo";
+        //String connectString = "jdbc:oracle:thin:@telline.univ-tlse3.fr:1521:etupre";
     
-        DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
+        //DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
         
-        conn = DriverManager.getConnection(connectString, login, passw);
+        //conn = DriverManager.getConnection(connectString, login, passw);
+		conn = dataSource.getConnection();
         System.out.println("Connexion OK");
+
+    }
+	
+	private void reconnexion() throws SQLException {
+		conn = dataSource.getConnection();
+        System.out.println("Reconnexion OK");
 
     }
 	
@@ -235,6 +311,20 @@ public class DatabaseAccess {
 	
 	public Thread getT() {
 		return t;
+	}
+	
+	
+	public Timer getTimerCheckAlive() {
+		return timerCheckAlive;
+	}
+	
+	public Connection getConn() {
+		return conn;
+	}
+	
+	public void stopThread() throws InterruptedException {
+		this.run = false;
+		this.t.join();
 	}
 	
 	
