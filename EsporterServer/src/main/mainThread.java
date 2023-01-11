@@ -49,7 +49,7 @@ public class mainThread {
 			data = new Data();
 			initializeApp();
 			instance = this;
-			ServerSocket server = new ServerSocket(80);
+			ServerSocket server = new ServerSocket(4000);
 			System.out.println("Serv d�marr�");
 			while(running) {
 				System.out.println("En attente d'une connexion");
@@ -222,7 +222,7 @@ public class mainThread {
 		
 	}
 	
-	private ArrayList<TypesPool> getPool(TypesTournament tournoi, int idJeux) throws InterruptedException, SQLException {
+	public ArrayList<TypesPool> getPool(TypesTournament tournoi, int idJeux) throws InterruptedException, SQLException {
 		ArrayList<TypesPool> pools = new ArrayList<>();
 		
 		Query pool = new Query(Query.getPool(tournoi.getId(), idJeux), typeRequete.QUERY);
@@ -274,28 +274,25 @@ public class mainThread {
 	}
 	
 	
-	public synchronized void miseAJourData(TypesID info, Types data) {
+	public synchronized void miseAJourData(HashMap<TypesID, Types> m) {
 		System.out.println("MISE A JOUR DES DATA");
 		ResponseObject r;
-		HashMap<TypesID, Types> m = new HashMap<>();
-		m.put(info, data);
-		switch (info) {
+		TypesID infos = m.keySet().iterator().next();
+		switch (infos) {
 		case PLAYER:
-			TypesPlayer joueur = (TypesPlayer)data;
-			this.data.getStables().get(joueur.getIdStable()).getTeams().get(joueur.getIdTeam()).modifyPlayer(joueur);
 			r = new ResponseObject(Response.UPDATE_PLAYER, m, null);
 			sendAll(r);
 			break;
 		case TOURNAMENT:
-			TypesTournament tournoi = (TypesTournament)data;
-			this.data.getCalendar().put(tournoi.getId(), tournoi);
 			r = new ResponseObject(Response.UPDATE_TOURNAMENT, m, null);
 			sendAll(r);
 			break;
 		case TEAM:
-			TypesTeam equipe = (TypesTeam)data;
-			this.data.getStables().get(equipe.getStable().getId()).getTeams().put(equipe.getId(), equipe);
 			r = new ResponseObject(Response.UPDATE_TEAM, m, null);
+			sendAll(r);
+			break;
+		case MATCH:
+			r = new ResponseObject(Response.UPDATE_MATCH, m, null);
 			sendAll(r);
 			break;
 		} 

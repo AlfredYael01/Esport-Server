@@ -6,12 +6,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import model.database.DatabaseAccess;
 import model.database.Query;
 import model.database.Result;
 import model.database.Query.typeRequete;
 import model.socket.ResponseObject;
+import types.Types;
 import types.TypesFame;
 import types.TypesGame;
 import types.TypesID;
@@ -71,7 +73,10 @@ public class ConnectionClient {
 			Result r = DatabaseAccess.getInstance().insertData(req);
 			int id = r.getInteger();
 			t.setId(id);
-			mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, t);
+			mainThread.getInstance().getData().getCalendar().put(t.getId(), t);
+			HashMap<TypesID, Types> m = new HashMap<>();
+			m.put(TypesID.TOURNAMENT, t);
+			mainThread.getInstance().miseAJourData(m);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

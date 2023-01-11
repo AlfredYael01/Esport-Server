@@ -3,6 +3,7 @@ package types;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 public class TypesMatch implements Types, Serializable {
 
@@ -72,6 +73,24 @@ public class TypesMatch implements Types, Serializable {
 		return true;
 		
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(team1, team2);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TypesMatch other = (TypesMatch) obj;
+		return team1 == other.team1 && team2 == other.team2;
+	}
+	
 	
 	
 }

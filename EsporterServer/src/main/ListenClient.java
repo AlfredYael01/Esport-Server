@@ -36,6 +36,7 @@ import types.Types;
 import types.TypesGame;
 import types.TypesPlayer;
 import types.TypesLogin;
+import types.TypesMatch;
 import types.TypesPermission;
 import types.TypesRegisterTeam;
 import types.TypesFame;
@@ -116,6 +117,9 @@ public class ListenClient implements Runnable{
 			case MODIFY_TOURNAMENT:
 				modifyTournament(((TypesTournament)c.getInfoByID(TypesID.TOURNAMENT)));
 				break;
+			case SCORE:
+				changeScore(c);
+				break;
 			default:
 			}
 
@@ -143,9 +147,32 @@ public class ListenClient implements Runnable{
 		}
 	}
 	
+	private void changeScore(Command c) {
+		int idTournoi = ((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger();
+		int Pool = ((TypesInteger)c.getInfoByID(TypesID.POOL)).getInteger();
+		TypesMatch match = ((TypesMatch)c.getInfoByID(TypesID.MATCH));
+		
+		for(TypesMatch m : mainThread.getInstance().getData().getCalendar().get(idTournoi).getPool().get(Pool).getMatchs()) {
+			if(m.equals(match)) {
+				m.setPoint(match.getTeam1Score(), match.getTeam2Score());
+				break;
+			}
+		}
+		
+		HashMap<TypesID, Types> m = new HashMap<>();
+		m.put(TypesID.MATCH, match);
+		m.put(TypesID.TOURNAMENT, new TypesInteger(idTournoi));
+		m.put(TypesID.POOL, new TypesInteger(Pool));
+		
+		mainThread.getInstance().miseAJourData(m);
+	}
+	
 	
 	private void modifyTournament(TypesTournament t) {
-		mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, t);
+		mainThread.getInstance().getData().getCalendar().put(t.getId(), t);
+		HashMap<TypesID, Types> m = new HashMap<>();
+		m.put(TypesID.TOURNAMENT, t);
+		mainThread.getInstance().miseAJourData(m);
 	}
 
 	private void ajouterEquipe(TypesRegisterTeam equipe) {
@@ -192,7 +219,10 @@ public class ListenClient implements Runnable{
 				joueurs.put(resJou.getInteger(), joueur);
 			}
 			eq.setPlayers(joueurs);
-			mainThread.getInstance().miseAJourData(TypesID.TEAM, eq);
+			mainThread.getInstance().getData().getStables().get(eq.getStable().getId()).getTeams().put(eq.getId(), eq);
+			HashMap<TypesID, Types> m = new HashMap<>();
+			m.put(TypesID.TEAM, eq);
+			mainThread.getInstance().miseAJourData(m);
 
 		} catch (InterruptedException | SQLException e) {
 			erreurAjoutEquipe(res.getInteger());
@@ -245,7 +275,10 @@ public class ListenClient implements Runnable{
 				e.printStackTrace();
 			}
 		}
-		mainThread.getInstance().miseAJourData(TypesID.TEAM, team);
+		mainThread.getInstance().getData().getStables().get(team.getStable().getId()).getTeams().put(team.getId(), team);
+		HashMap<TypesID, Types> m = new HashMap<>();
+		m.put(TypesID.TEAM, team);
+		mainThread.getInstance().miseAJourData(m);
 
 	}
 	
@@ -312,11 +345,15 @@ public class ListenClient implements Runnable{
 		tournoi.registerTeam(id_equipe);
 		if(tournoi.isFull()) {
 			//on charge le tournoi
+			tournoi.setPool(mainThread.getInstance().getPool(tournoi, TypesGame.gameToInt(tournoi.getGame())));
 		}
 
 		//Il manque le get Poule
 
-		mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, tournoi);
+		mainThread.getInstance().getData().getCalendar().put(tournoi.getId(), tournoi);
+		HashMap<TypesID, Types> m = new HashMap<>();
+		m.put(TypesID.TOURNAMENT, tournoi);
+		mainThread.getInstance().miseAJourData(m);
 
 	} catch (InterruptedException | SQLException e) {
 		e.printStackTrace();
@@ -331,6 +368,11 @@ private void desinscriptionTournoi(int id_Tournoi, int id_Joueur, int id_Jeu) {
 		Result res = DatabaseAccess.getInstance().getData(r);
 		res.getResultSet().next();
 		int id_equipe = res.getResultSet().getInt("id_equipe");
+		
+		if(mainThread.getInstance().getData().getCalendar().get(id_Tournoi).isFull()) {
+			error("Le tournoi a deja commencé vous ne pouvez plus vous desinscrire");
+			
+		}
 
 		r = new Query(Query.unregisterTournament(id_Jeu, id_Tournoi, id_equipe), typeRequete.PROCEDURE);
 		res = DatabaseAccess.getInstance().getData(r);
@@ -352,7 +394,10 @@ private void desinscriptionTournoi(int id_Tournoi, int id_Joueur, int id_Jeu) {
 		//TournoiInfo tournoi = mainThread.getInstance().getData().getCalendrier().get(id_Tournoi).clone();
 		tournoi.unregisterTeam(id_equipe);
 
-		mainThread.getInstance().miseAJourData(TypesID.TOURNAMENT, tournoi);
+		mainThread.getInstance().getData().getCalendar().put(tournoi.getId(), tournoi);
+		HashMap<TypesID, Types> m = new HashMap<>();
+		m.put(TypesID.TOURNAMENT, tournoi);
+		mainThread.getInstance().miseAJourData(m);
 
 
 	} catch (InterruptedException | SQLException e) {
