@@ -55,7 +55,7 @@ public class DatabaseAccess {
 		
 		//Ping the db to know if the connection is stil active
 		timerCheckAlive = new Timer();
-		timerCheckAlive.scheduleAtFixedRate(tt, 120000, 60000);;
+		timerCheckAlive.scheduleAtFixedRate(tt, 120000, 120000);;
 		
 		
 		

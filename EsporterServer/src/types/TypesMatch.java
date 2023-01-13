@@ -5,7 +5,25 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
 
-public class TypesMatch implements Types, Serializable {
+public class TypesMatch implements Types, Serializable, Comparable<TypesMatch> {
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(idPool, idTournament, team1, team2);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TypesMatch other = (TypesMatch) obj;
+		return idPool == other.idPool && idTournament == other.idTournament && team1 == other.team1
+				&& team2 == other.team2;
+	}
 
 	/**
 	 * 
@@ -17,14 +35,18 @@ public class TypesMatch implements Types, Serializable {
 	private int winner;
 	private int team1;
 	private int team2;
+	private int idTournament;
+	private int idPool;
 	
-	public TypesMatch(Timestamp date, int team1, int team2, int winner, int team1Score, int team2Score ) {
+	public TypesMatch(Timestamp date, int team1, int team2, int winner, int team1Score, int team2Score, int idTournament, int idPool) {
 		this.date = date;
 		this.team1 = team1;
 		this.team2 = team2;
 		this.winner = winner;
 		this.team1Score = team1Score;
 		this.team2Score = team2Score;
+		this.idPool = idPool;
+		this.idTournament = idTournament;
 	}
 	
 	private void setWinner(int winner) {
@@ -33,9 +55,9 @@ public class TypesMatch implements Types, Serializable {
 	
 	public void setPoint(int team1Score, int team2Score) {
 		if(team1Score>team2Score) {
-			setWinner(team1Score);
+			setWinner(team1);
 		} else if (team1Score<team2Score) {
-			setWinner(team2Score);
+			setWinner(team2);
 		} else {
 			return;
 		}
@@ -67,30 +89,25 @@ public class TypesMatch implements Types, Serializable {
 		return team2;
 	}
 	
+	public int getIdPool() {
+		return idPool;
+	}
+	
+	public int getIdTournament() {
+		return idTournament;
+	}
+	
 	public boolean isPlayed() {
-		if (winner!= team1 && winner!=team2)
+		if (winner!= team1 && winner!=team2 && team1==team2)
 			return false;
 		return true;
 		
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(team1, team2);
+	public int compareTo(TypesMatch o) {
+		return getDate().compareTo(o.getDate());
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TypesMatch other = (TypesMatch) obj;
-		return team1 == other.team1 && team2 == other.team2;
-	}
-	
 	
 	
 }

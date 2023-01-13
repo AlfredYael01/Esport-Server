@@ -12,8 +12,11 @@ import java.io.ObjectOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 
 import javax.imageio.ImageIO;
@@ -35,6 +38,8 @@ import types.TypesID;
 import types.Types;
 import types.TypesGame;
 import types.TypesPlayer;
+import types.TypesPool;
+import types.TypesRanking;
 import types.TypesLogin;
 import types.TypesMatch;
 import types.TypesPermission;
@@ -151,20 +156,165 @@ public class ListenClient implements Runnable{
 		int idTournoi = ((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger();
 		int Pool = ((TypesInteger)c.getInfoByID(TypesID.POOL)).getInteger();
 		TypesMatch match = ((TypesMatch)c.getInfoByID(TypesID.MATCH));
+		TypesGame jeu = mainThread.getInstance().getData().getCalendar().get(match.getIdTournament()).getGame();
+		Query q;
+		System.out.println("Gagnant = "+match.getWinner());
+		if(match.getWinner() == match.getTeam1()) {
+			q = new Query(Query.setScoreA(match.getWinner(), idTournoi, Pool, match.getTeam1(), match.getTeam2(), TypesGame.gameToInt(jeu)), typeRequete.QUERY);
+		}else {
+			q = new Query(Query.setScoreB(match.getWinner(), idTournoi, Pool, match.getTeam1(), match.getTeam2(), TypesGame.gameToInt(jeu)), typeRequete.QUERY);
+		}
+		try {
+			DatabaseAccess.getInstance().getData(q);
+			DatabaseAccess.getInstance().getData(new Query(Query.remplissagePoule(Pool, idTournoi, TypesGame.gameToInt(jeu), match.getWinner(), match.getTeam1(), match.getTeam2()),typeRequete.PROCEDURE));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
-		for(TypesMatch m : mainThread.getInstance().getData().getCalendar().get(idTournoi).getPool().get(Pool).getMatchs()) {
+		TypesPool pool = mainThread.getInstance().getData().getCalendar().get(idTournoi).getPool().get(Pool-1);
+		for(TypesMatch m : pool.getMatchs()) {
 			if(m.equals(match)) {
 				m.setPoint(match.getTeam1Score(), match.getTeam2Score());
 				break;
 			}
 		}
 		
-		HashMap<TypesID, Types> m = new HashMap<>();
+		
+		
+		TypesTournament t = mainThread.getInstance().getData().getCalendar().get(match.getIdTournament());
+		ArrayList<TypesPool> listP = t.getPool();
+		
+		for(TypesPool p : listP) {
+			if(p.getId() == match.getIdPool()) {
+				p.getPoint().put(mainThread.getInstance().getData().getTeams().get(match.getWinner()), pool.getPoint().get(mainThread.getInstance().getData().getTeams().get(match.getWinner()+1)));
+			}
+		}
+		
+		try {
+			listP = mainThread.getInstance().getPool(t, TypesGame.gameToInt(t.getGame()));
+			mainThread.getInstance().getData().getCalendar().get(t.getId()).setPool(listP);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		TypesPool p = listP.get(4);
+		if(p.getPoint().size()!=4 && !p.poolFinished()) {
+			
+			try {
+				DatabaseAccess.getInstance().getData(new Query(Query.rencontrepouleFinale(idTournoi, Pool),typeRequete.PROCEDURE));
+				listP = mainThread.getInstance().getPool(t, TypesGame.gameToInt(t.getGame()));
+				mainThread.getInstance().getData().getCalendar().get(t.getId()).setPool(listP);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	
+		
+		/*HashMap<TypesID, Types> m = new HashMap<>();
 		m.put(TypesID.MATCH, match);
 		m.put(TypesID.TOURNAMENT, new TypesInteger(idTournoi));
 		m.put(TypesID.POOL, new TypesInteger(Pool));
 		
-		mainThread.getInstance().miseAJourData(m);
+		ResponseObject r = new ResponseObject(Response.UP,m,null);*/
+		
+		HashMap<TypesID, Types> m = new HashMap<>();
+		m.put(TypesID.TOURNAMENT, mainThread.getInstance().getData().getCalendar().get(t.getId()));
+		ResponseObject r = new ResponseObject(Response.UPDATE_TOURNAMENT,m,null);
+		
+		
+		mainThread.getInstance().sendAll(r);
+		
+		TypesTournament tournois = mainThread.getInstance().getData().getCalendar().get(t.getId());
+		if (tournois.getPool().get(4).poolFinished()) {
+			int multiplicateur = 1;
+			int point = 100;
+
+			//100 60 30 10
+			switch(tournois.getFame()) {
+			case INTERNATIONAL:
+				multiplicateur = 3;
+				break;
+			case NATIONAL:
+				multiplicateur = 2;
+				break;
+			case LOCAL:
+				multiplicateur = 1;
+				break;
+			}
+			
+			Comparator<TypesTeam> comp = new Comparator<TypesTeam>() {
+				
+				@Override
+				public int compare(TypesTeam o1, TypesTeam o2) {
+					if(tournois.getPool().get(4).getPoint().get(o1).compareTo(tournois.getPool().get(4).getPoint().get(o2))==0 ) {
+						return o1.getId() - (o2.getId());
+					}
+					return tournois.getPool().get(4).getPoint().get(o1).compareTo(tournois.getPool().get(4).getPoint().get(o2));
+				}
+			};
+			
+			List<TypesTeam> listeTeamSort = new ArrayList<>(tournois.getPool().get(4).getPoint().keySet());
+			Collections.sort(listeTeamSort, comp.reversed());
+			int passage = 1;
+			for(TypesTeam team : listeTeamSort) {
+				switch(passage) {
+				case 1:
+					point = 100*multiplicateur;
+					break;
+				case 2:
+					point = 60*multiplicateur;
+					break;
+				case 3:
+					point = 30*multiplicateur;
+					break;
+				case 4:
+					point = 10*multiplicateur;
+					break;
+				}
+				passage++;
+				try {
+					DatabaseAccess.getInstance().getData(new Query(Query.setScore(team.getStable().getId(),TypesGame.gameToInt(jeu) , point),typeRequete.PROCEDURE));
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			for(TypesRanking ranking : mainThread.getInstance().getData().getRanking().values()) {
+				if(ranking.getGame()==jeu) {
+					mainThread.getInstance().getData().getRanking().get(ranking.getId()).setStables(mainThread.getInstance().getCalendar(ranking.getId()));
+					HashMap<TypesID, Types> m2 = new HashMap<>();
+					m2.put(TypesID.RANKING, mainThread.getInstance().getData().getRanking().get(ranking.getId()));
+					ResponseObject r2 = new ResponseObject(Response.UPDATE_RANKING,m2,null);
+					mainThread.getInstance().sendAll(r2);
+					break;
+				}
+			}
+			
+			
+		}
+		
+		
 	}
 	
 	

@@ -178,6 +178,26 @@ public class Query {
 		return String.format("select nombrepoint from cmf4263a.appartenir where id_utilisateur = %d and id_classement = %d", id_user, id_classement);
 	}
 	
+	public static String setScoreA(int idWinner, int idTournament, int idPool, int idEquipeA, int idEquipeB, int idJeux) {
+		return String.format("update cmf4263a.rencontre set gagnant = %d, nombrepointequipe1 = 1, nombrepointequipe2=0 where id_tournois = %d and id_jeux = %d and id_poule = %d and id_equipeA = %d and id_equipeB = %d", idWinner, idTournament, idJeux, idPool, idEquipeA, idEquipeB);
+	}
+	
+	public static String setScoreB(int idWinner, int idTournament, int idPool, int idEquipeA, int idEquipeB, int idJeux) {
+		return String.format("update cmf4263a.rencontre set gagnant = %d, nombrepointequipe1 = 0, nombrepointequipe2=1 where id_tournois = %d and id_jeux = %d and id_poule = %d and id_equipeA = %d and id_equipeB = %d", idWinner, idTournament, idJeux, idPool, idEquipeA, idEquipeB);
+	}
+	
+	public static String remplissagePoule(int idPoule, int idTournoi, int Idjeux, int idWinner, int idA, int idB) {
+		return String.format("{ call cmf4263a.remplissagePoule(%d,%d,%d,%d,%d,%d)}", idPoule,idTournoi,Idjeux,idWinner,idA,idB);
+	}
+	
+	public static String rencontrepouleFinale(int idTournoi, int idJeux) {
+		return String.format("{ call cmf4263a.rencontrepoule(%d,%d)}",idJeux, idTournoi);
+	}
+	
+	public static String setScore(int idUser, int idJeux, int score) {
+		return String.format("{ call cmf4263a.setscore(%d,%d,%d)}",score, idJeux, idUser);
+	}
+	
 	
 	
 	

@@ -43,6 +43,17 @@ public class TypesPool implements Types, Serializable{
 		return matchs;
 	}
 	
+	public boolean poolFinished() {
+		int res =0;
+		for(Integer i : point.values()) {
+			res += i;
+		}
+		if(res == 6) {
+			return true;
+		}
+		return false;
+	}
+	
 	
 	
 	

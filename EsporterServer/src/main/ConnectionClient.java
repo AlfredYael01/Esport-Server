@@ -108,6 +108,7 @@ public class ConnectionClient {
 	
 	public void send(ResponseObject o) {
 		try {
+			out.reset();
 			out.writeObject(o);
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -207,19 +207,29 @@ public class mainThread {
 		ResultSet allRanking = DatabaseAccess.getInstance().getData(new Query(Query.getAllRanking(), typeRequete.QUERY)).getResultSet();
 		while(allRanking.next()) {
 			TypesRanking rank = new TypesRanking(TypesGame.intToGame(allRanking.getInt("id_jeux")), allRanking.getInt("id_classement"));
-			HashMap<Integer, Integer> stableAndScore = new HashMap<>();
 			
-			for(TypesStable st : data.getStables().values()) {
-				ResultSet rankingStable = DatabaseAccess.getInstance().getData(new Query(Query.getRankingByUserByGame(st.getId(), allRanking.getInt("id_classement")), typeRequete.QUERY)).getResultSet();
-				rankingStable.next();
-				stableAndScore.put(st.getId(), rankingStable.getInt("nombrepoint"));
-			}
 			
-			rank.setStables(stableAndScore);
+			rank.setStables(getCalendar(allRanking.getInt("id_classement")));
 			data.getRanking().put(rank.getId(), rank);
 			System.out.println("Classement du jeux : "+TypesGame.intToGame(allRanking.getInt("id_jeux")));
 		}
 		
+	}
+	
+	public HashMap<Integer, Integer> getCalendar(int idClassement) {
+		try {
+			HashMap<Integer, Integer> stableAndScore = new HashMap<>();
+			
+			for(TypesStable st : data.getStables().values()) {
+				ResultSet rankingStable = DatabaseAccess.getInstance().getData(new Query(Query.getRankingByUserByGame(st.getId(), idClassement), typeRequete.QUERY)).getResultSet();
+				rankingStable.next();
+				stableAndScore.put(st.getId(), rankingStable.getInt("nombrepoint"));
+			}
+			return stableAndScore;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	public ArrayList<TypesPool> getPool(TypesTournament tournoi, int idJeux) throws InterruptedException, SQLException {
@@ -238,6 +248,7 @@ public class mainThread {
 			ArrayList<TypesMatch> matchsList = new ArrayList<>();
 			//Match des poules
 			if(tournoi.isFull()) {
+
 			
 				ResultSet allMatch = DatabaseAccess.getInstance().getData(new Query(Query.getMatchs(tournoi.getId(), allPool.getInt("id_poule"), idJeux), typeRequete.QUERY)).getResultSet();
 				while(allMatch.next()) {
@@ -245,7 +256,7 @@ public class mainThread {
 					if(allMatch.getInt("Gagnant")!=0) {
 						gagnant = allMatch.getInt("Gagnant");
 					}
-					TypesMatch match = new TypesMatch(allMatch.getTimestamp("DateMatch"), allMatch.getInt("id_equipeA"), allMatch.getInt("id_equipeB"), gagnant, allMatch.getInt("nombrePointEquipe1"), allMatch.getInt("nombrePointEquipe2"));
+					TypesMatch match = new TypesMatch(allMatch.getTimestamp("DateMatch"), allMatch.getInt("id_equipeA"), allMatch.getInt("id_equipeB"), gagnant, allMatch.getInt("nombrePointEquipe1"), allMatch.getInt("nombrePointEquipe2"), tournoi.getId(), allPool.getInt("id_poule"));
 					matchsList.add(match);
 				}
 				System.out.println("\tMatch pool "+allPool.getInt("id_poule")+" OK");
@@ -277,7 +288,12 @@ public class mainThread {
 	public synchronized void miseAJourData(HashMap<TypesID, Types> m) {
 		System.out.println("MISE A JOUR DES DATA");
 		ResponseObject r;
-		TypesID infos = m.keySet().iterator().next();
+		TypesID infos;
+		if(m.size()>1) {
+			infos = m.keySet().iterator().next();
+		}else {
+			infos = TypesID.MATCH;
+		}
 		switch (infos) {
 		case PLAYER:
 			r = new ResponseObject(Response.UPDATE_PLAYER, m, null);
