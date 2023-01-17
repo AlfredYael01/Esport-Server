@@ -376,11 +376,11 @@ public class ListenClient implements Runnable{
 			Query r = new Query(Query.addTeam(TypesGame.gameToInt(equipe.getGame()), equipe.getIdStable()), typeRequete.FUNCTION);
 			res = DatabaseAccess.getInstance().getData(r);
 			if (res.isError()) {
-				error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
+				error("Erreur dans la creation des equipes veuillez ressayer plus tard");
 			}
 		} catch (InterruptedException | SQLException e) {
 			e.printStackTrace();
-			error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
+			error("Erreur dans la creation des equipes veuillez ressayer plus tard");
 			return;
 		}
 		try {
