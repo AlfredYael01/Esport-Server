@@ -52,7 +52,7 @@ public class Query {
 	}
 	
 	public static String getUserByID(int id) {
-		return "select nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, nomecurie, logoecurie, diminutifecurie, id_role, id_nationalite, id_equipe from cmf4263a.utilisateur where id_utilisateur = "+id;
+		return "select username, nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur, nomecurie, logoecurie, diminutifecurie, id_role, id_nationalite, id_equipe from cmf4263a.utilisateur where id_utilisateur = "+id;
 	}
 	
 	public static String getCalendar() {
@@ -119,7 +119,7 @@ public class Query {
 	}
 	
 	public static String allPlayerByTeam(int id) {
-		return "select id_utilisateur, nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur from cmf4263a.Utilisateur where "+id+" = id_equipe and id_role = 3";
+		return "select username, id_utilisateur, nomjoueur, prenomjoueur, photojoueur, datenaissancejoueur, datecontratjoueur, fincontratjoueur from cmf4263a.Utilisateur where "+id+" = id_equipe and id_role = 3";
 	}
 	
 	public static String allTeamByStables(int id) {
@@ -132,6 +132,10 @@ public class Query {
 	}
 	public static String addPlayer(String username,  String password , String NomJoueur, String PrenomJoueur, int Id_Equipe, int Id_Nationalite) {
 		return "{? = call cmf4263a.registerJoueur('"+ username + "','"+ password+"','"+NomJoueur+ "','"+PrenomJoueur+"',?,?,?,?,"+Id_Nationalite+","+Id_Equipe+")}";
+	}
+	
+	public static String addStable(String username, String password, String name, String nickname) {
+		return String.format("{? = call cmf4263a.registerEcurie(%s,%s,%s,?,%s)}",username, password, name, nickname);
 	}
 	
 	public static String removePlayerByTeam(int id) {

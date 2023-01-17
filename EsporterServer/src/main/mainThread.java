@@ -148,7 +148,7 @@ public class mainThread {
 				while(resultJoueur.next()) {
 					BufferedImage bf1 = ImageIO.read(resultJoueur.getBinaryStream("photojoueur"));
 					TypesImage im1 = new TypesImage(bf1, "png");
-					joueur = new TypesPlayer(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getTimestamp("datenaissancejoueur"), resultJoueur.getTimestamp("datecontratjoueur"), resultJoueur.getTimestamp("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId());
+					joueur = new TypesPlayer(resultJoueur.getInt("Id_Utilisateur"), resultJoueur.getString("nomjoueur"), resultJoueur.getString("prenomjoueur"), im1, resultJoueur.getTimestamp("datenaissancejoueur"), resultJoueur.getTimestamp("datecontratjoueur"), resultJoueur.getTimestamp("fincontratJoueur"), -1, rs.getInt("Id_Equipe"), ec.getId(), resultJoueur.getString("username"));
 					joueurs.put(joueur.getId(), joueur);
 					System.out.println("\tJoueur "+joueur.getFirstName());
 				}
@@ -289,7 +289,7 @@ public class mainThread {
 		System.out.println("MISE A JOUR DES DATA");
 		ResponseObject r;
 		TypesID infos;
-		if(m.size()>1) {
+		if(m.size()==1) {
 			infos = m.keySet().iterator().next();
 		}else {
 			infos = TypesID.MATCH;

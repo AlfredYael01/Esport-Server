@@ -115,6 +115,8 @@ public class ListenClient implements Runnable{
 
 				break;
 			case STABLE:
+				//register new Stable
+				registerStable(c);
 				break;
 			case DELETE_TOURNAMENT:
 				deleteTournament(((TypesInteger)c.getInfoByID(TypesID.TOURNAMENT)).getInteger());
@@ -150,6 +152,49 @@ public class ListenClient implements Runnable{
 				errorPermission();
 			}
 		}
+	}
+	
+	
+	private void registerStable(Command c) {
+		TypesStable s = (TypesStable) c.getInfoByID(TypesID.STABLE);
+		TypesLogin l = (TypesLogin) c.getInfoByID(TypesID.LOGIN);
+		
+		Query q = new Query(Query.addStable(l.getUsername(), l.getPassword(), s.getName(), s.getNickname()),typeRequete.INSERTPLAYER);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		try {
+			ImageIO.write(s.getLogo().getImage(), "png", os);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		InputStream is = new ByteArrayInputStream(os.toByteArray());
+		q.setInputStream(is);
+		
+		try {
+			Result r = DatabaseAccess.getInstance().getData(q);
+			if(r.isError()) {
+				error("Impossible de s'inscrire");
+				return;
+			}
+			ResultSet rs = r.getResultSet();
+			rs.next();
+			int id = rs.getInt(1);
+			s.setId(id);
+			mainThread.getInstance().getData().getStables().put(id, s);
+			
+			HashMap<TypesID, Types> m = new HashMap<>();
+			m.put(TypesID.STABLE, s);
+			ResponseObject res = new ResponseObject(Response.UPDATE_STABLE,m,null);
+			mainThread.getInstance().sendAll(res);
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 	}
 	
 	private void changeScore(Command c) {
@@ -612,7 +657,7 @@ private void login(Command c) {
 				
 				BufferedImage bf = ImageIO.read(rs.getBinaryStream("photojoueur"));
 				TypesImage im = new TypesImage(bf, "png");
-				m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getTimestamp("datenaissancejoueur"), rs.getTimestamp("datecontratjoueur"), rs.getTimestamp("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_utilisateur")));
+				m.put(TypesID.PLAYER, new TypesPlayer(result, rs.getString("nomjoueur"), rs.getString("prenomjoueur"),im, rs.getTimestamp("datenaissancejoueur"), rs.getTimestamp("datecontratjoueur"), rs.getTimestamp("fincontratJoueur"), rs.getInt("id_nationalite"), rs.getInt("id_equipe"), resultset.getInt("id_utilisateur"), rs.getString("username")));
 				break;
 			case 4:
 				m.put(TypesID.PERMISSION, TypesPermission.STABLE);
