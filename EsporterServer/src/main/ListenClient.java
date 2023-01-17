@@ -372,15 +372,12 @@ public class ListenClient implements Runnable{
 
 	private void ajouterEquipe(TypesRegisterTeam equipe) {
 		Result res = null;
-		int idTeam = 0;
 		try {
 			Query r = new Query(Query.addTeam(TypesGame.gameToInt(equipe.getGame()), equipe.getIdStable()), typeRequete.FUNCTION);
 			res = DatabaseAccess.getInstance().getData(r);
 			if (res.isError()) {
 				error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
 			}
-			res.getResultSet().next();
-			idTeam = res.getResultSet().getInt(1);
 		} catch (InterruptedException | SQLException e) {
 			e.printStackTrace();
 			error("Erreur dans la creation des equipes veuillez ressayyer plus tard");
@@ -401,7 +398,7 @@ public class ListenClient implements Runnable{
 			HashMap<Integer, TypesPlayer> joueurs = new HashMap<>();
 			for (TypesRegisterPlayer jou : equipe.getPlayers()) {
 				TypesPlayer joueur = jou.getPlayer();
-				Query reqJou = new Query(Query.addPlayer(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getName(),joueur.getFirstName(), res.getInteger(), idTeam),typeRequete.INSERTPLAYER);
+				Query reqJou = new Query(Query.addPlayer(jou.getLogin().getUsername(), jou.getLogin().getPassword(), joueur.getName(),joueur.getFirstName(), res.getInteger(), 1),typeRequete.INSERTPLAYER);
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
 				ImageIO.write(joueur.getImage().getImage(), "png", os);
 				InputStream is = new ByteArrayInputStream(os.toByteArray());
