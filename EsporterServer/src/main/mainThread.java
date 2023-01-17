@@ -221,9 +221,10 @@ public class mainThread {
 			HashMap<Integer, Integer> stableAndScore = new HashMap<>();
 			
 			for(TypesStable st : data.getStables().values()) {
+				
 				ResultSet rankingStable = DatabaseAccess.getInstance().getData(new Query(Query.getRankingByUserByGame(st.getId(), idClassement), typeRequete.QUERY)).getResultSet();
-				rankingStable.next();
-				stableAndScore.put(st.getId(), rankingStable.getInt("nombrepoint"));
+				if(rankingStable.next())
+					stableAndScore.put(st.getId(), rankingStable.getInt("nombrepoint"));
 			}
 			return stableAndScore;
 		} catch (Exception e) {
