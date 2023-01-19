@@ -139,6 +139,7 @@ public class ListenClient implements Runnable{
 			case CALENDAR:
 				break;
 			case STABLE:
+				registerStable(c);
 				break;
 			case INIT:
 
@@ -176,12 +177,10 @@ public class ListenClient implements Runnable{
 				error("Impossible de s'inscrire");
 				return;
 			}
-			ResultSet rs = r.getResultSet();
-			rs.next();
-			int id = rs.getInt(1);
+			
+			int id = r.getInteger();
 			s.setId(id);
 			mainThread.getInstance().getData().getStables().put(id, s);
-			rs.close();
 			
 			HashMap<TypesID, Types> m = new HashMap<>();
 			m.put(TypesID.STABLE, s);

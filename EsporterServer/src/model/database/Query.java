@@ -126,16 +126,12 @@ public class Query {
 		return "select e.id_equipe, id_jeux, e.id_utilisateur from cmf4263a.Equipe e where "+id+" = e.id_Utilisateur";
 	}
 	
-	public static String addStable(String  username, String password, String NomEcurie, String DiminutifEcurie, String LogoEcurie) {
-		return "{? = call cmf4263a.registerEcurie("+ username+","+ password +","+ NomEcurie +","+ LogoEcurie +","+ DiminutifEcurie +")}"	;
-
-	}
 	public static String addPlayer(String username,  String password , String NomJoueur, String PrenomJoueur, int Id_Equipe, int Id_Nationalite) {
 		return "{? = call cmf4263a.registerJoueur('"+ username + "','"+ password+"','"+NomJoueur+ "','"+PrenomJoueur+"',?,?,?,?,"+Id_Nationalite+","+Id_Equipe+")}";
 	}
 	
 	public static String addStable(String username, String password, String name, String nickname) {
-		return String.format("{? = call cmf4263a.registerEcurie(%s,%s,%s,?,%s)}",username, password, name, nickname);
+		return String.format("{? = call cmf4263a.registerEcurie('%s','%s','%s',?,'%s')}",username, password, name, nickname);
 	}
 	
 	public static String removePlayerByTeam(int id) {
