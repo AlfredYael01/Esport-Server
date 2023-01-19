@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -180,6 +181,7 @@ public class ListenClient implements Runnable{
 			int id = rs.getInt(1);
 			s.setId(id);
 			mainThread.getInstance().getData().getStables().put(id, s);
+			rs.close();
 			
 			HashMap<TypesID, Types> m = new HashMap<>();
 			m.put(TypesID.STABLE, s);
@@ -393,7 +395,7 @@ public class ListenClient implements Runnable{
 			TypesImage im1 = new TypesImage(bf1, "png");
 
 			TypesStable ecurie = new TypesStable(rs.getString("nomecurie"), im1, rs.getString("diminutifecurie"), equipe.getIdStable());
-
+			rs.close();
 			TypesTeam eq = new TypesTeam(equipe.getGame(), ecurie, null,res.getInteger());
 			HashMap<Integer, TypesPlayer> joueurs = new HashMap<>();
 			for (TypesRegisterPlayer jou : equipe.getPlayers()) {
@@ -405,6 +407,7 @@ public class ListenClient implements Runnable{
 				reqJou.setInputStream(is);
 				reqJou.setDates(joueur.getBirthDate(), joueur.getContractStartDate(), joueur.getContractEndDate());
 				Result resJou = DatabaseAccess.getInstance().getData(reqJou);
+				resJou.getResultSet().close();
 				if (resJou.isError()) {
 					erreurAjoutEquipe(res.getInteger());
 					error("Erreur dans la creation des equipes veuillez ressayer plus tard");
@@ -504,20 +507,21 @@ public class ListenClient implements Runnable{
 			Result res = DatabaseAccess.getInstance().getData(r);
 			res.getResultSet().next();
 			int id_equipe = res.getResultSet().getInt("id_equipe");
-
+			res.getResultSet().close();
 
 			TypesTournament tournoi;
 			r = new Query(Query.getTournamentByID(id_Tournoi), typeRequete.QUERY);
 			res = DatabaseAccess.getInstance().getData(r);
 			ResultSet rs = res.getResultSet();
 			rs.next();
-			tournoi = new TypesTournament(rs.getTimestamp("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
-
+			tournoi = mainThread.getInstance().getData().getCalendar().get(id_Tournoi);
+			rs.close();
 			Query requete = new Query(Query.getTeamGame(id_equipe), typeRequete.QUERY);
 			ResultSet resultset = DatabaseAccess.getInstance().getData(requete).getResultSet();
 			resultset.next();
 
 			TypesGame jeuEquipe= TypesGame.intToGame(resultset.getInt("id_jeux"));
+			resultset.close();
 
 			System.out.println("Jeu tournoi :"+tournoi.getGame()+", jeux equipe : "+jeuEquipe);
 			if (tournoi.getGame() != jeuEquipe) {
@@ -540,6 +544,8 @@ public class ListenClient implements Runnable{
 		tournoi.registerTeam(id_equipe);
 		if(tournoi.isFull()) {
 			//on charge le tournoi
+			System.out.println("Tournoi full, chargement de la poule");
+			TimeUnit.SECONDS.sleep(5);
 			tournoi.setPool(mainThread.getInstance().getPool(tournoi, TypesGame.gameToInt(tournoi.getGame())));
 		}
 
@@ -563,6 +569,7 @@ private void desinscriptionTournoi(int id_Tournoi, int id_Joueur, int id_Jeu) {
 		Result res = DatabaseAccess.getInstance().getData(r);
 		res.getResultSet().next();
 		int id_equipe = res.getResultSet().getInt("id_equipe");
+		res.getResultSet().close();
 		
 		if(mainThread.getInstance().getData().getCalendar().get(id_Tournoi).isFull()) {
 			error("Le tournoi a deja commencé vous ne pouvez plus vous desinscrire");
@@ -583,7 +590,7 @@ private void desinscriptionTournoi(int id_Tournoi, int id_Joueur, int id_Jeu) {
 		ResultSet rs = res.getResultSet();
 		rs.next();
 		tournoi = new TypesTournament(rs.getTimestamp("datelimiteinscription"), rs.getString("nom"), TypesFame.intToRenommee(rs.getInt("Renommee")), TypesGame.intToGame(rs.getInt("id_jeux")), rs.getInt("id_tournois"));
-
+		rs.close();
 
 
 		//TournoiInfo tournoi = mainThread.getInstance().getData().getCalendrier().get(id_Tournoi).clone();
@@ -667,6 +674,7 @@ private void login(Command c) {
 				break;
 
 			}
+			rs.close();
 			ResponseObject r = new ResponseObject(Response.LOGIN, m, null);
 			client.send(r);
 			client.setIsLogin(true);

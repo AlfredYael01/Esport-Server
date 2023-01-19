@@ -123,6 +123,7 @@ public class mainThread {
 			TypesImage im1 = new TypesImage(bf1, "png");
 			ecuries.put(rs.getInt("id_utilisateur"), new TypesStable(rs.getString("nomEcurie"), im1, rs.getString("DiminutifEcurie"), rs.getInt("id_utilisateur")));
 		}
+		rs.close();
 		data.setStables(ecuries);
 		System.out.println("Load stable ok");
 		
@@ -152,10 +153,12 @@ public class mainThread {
 					joueurs.put(joueur.getId(), joueur);
 					System.out.println("\tJoueur "+joueur.getFirstName());
 				}
+				resultJoueur.close();
 				equipe = new TypesTeam(TypesGame.intToGame(rs.getInt("Id_Jeux")), ec , joueurs, rs.getInt("Id_Equipe"));
 				ec.addTeam(equipe);
 				data.getTeams().put(equipe.getId(), equipe);
 			}
+			rs.close();
 			
 			r = new Query(Query.getTitleByStable(ec.getId()), typeRequete.QUERY);
 			rs = db.getData(r).getResultSet();
@@ -165,6 +168,7 @@ public class mainThread {
 				palmares.add(new TypesTitle(rs.getString("libelle"),rs.getTimestamp("dateobtention")));
 				
 			}
+			rs.close();
 			ec.setTitles(palmares);
 			
 			
@@ -191,6 +195,7 @@ public class mainThread {
 			while (res.next()) {
 				inscrits.add(res.getInt("id_equipe"));
 			}
+			res.close();
 			System.out.println("\tInscrits OK");
 			tournoi.setRegistered(inscrits);
 			
@@ -199,6 +204,7 @@ public class mainThread {
 
 			calendrier.put(rs.getInt("id_tournois"), tournoi);
 		}
+		rs.close();
 		this.data.setCalendar(calendrier);
 		System.out.println("Load Calendar ok");
 
@@ -213,6 +219,7 @@ public class mainThread {
 			data.getRanking().put(rank.getId(), rank);
 			System.out.println("Classement du jeux : "+TypesGame.intToGame(allRanking.getInt("id_jeux")));
 		}
+		allRanking.close();
 		
 	}
 	
@@ -223,13 +230,15 @@ public class mainThread {
 			for(TypesStable st : data.getStables().values()) {
 				
 				ResultSet rankingStable = DatabaseAccess.getInstance().getData(new Query(Query.getRankingByUserByGame(st.getId(), idClassement), typeRequete.QUERY)).getResultSet();
-				if(rankingStable.next())
+				if(rankingStable.next()) {
 					stableAndScore.put(st.getId(), rankingStable.getInt("nombrepoint"));
+				}
+				rankingStable.close();
 			}
 			return stableAndScore;
 		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
+			return new HashMap<>();
 		}
 	}
 	
@@ -246,6 +255,7 @@ public class mainThread {
 			while (Equipe.next()) {
 				classement.put(this.data.getStables().get(Equipe.getInt("id_utilisateur")).getTeams().get(Equipe.getInt("id_equipe")), Equipe.getInt("point"));
 			}
+			Equipe.close();
 			ArrayList<TypesMatch> matchsList = new ArrayList<>();
 			//Match des poules
 			if(tournoi.isFull()) {
@@ -260,11 +270,13 @@ public class mainThread {
 					TypesMatch match = new TypesMatch(allMatch.getTimestamp("DateMatch"), allMatch.getInt("id_equipeA"), allMatch.getInt("id_equipeB"), gagnant, allMatch.getInt("nombrePointEquipe1"), allMatch.getInt("nombrePointEquipe2"), tournoi.getId(), allPool.getInt("id_poule"));
 					matchsList.add(match);
 				}
+				allMatch.close();
 				System.out.println("\tMatch pool "+allPool.getInt("id_poule")+" OK");
 			}
 
 			pools.add(new TypesPool(allPool.getInt("id_Poule"), tournoi.getId(), classement, matchsList));
 		}
+		allPool.close();
 		return pools;
 	}
 	
