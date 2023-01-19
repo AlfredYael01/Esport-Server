@@ -406,7 +406,6 @@ public class ListenClient implements Runnable{
 				reqJou.setInputStream(is);
 				reqJou.setDates(joueur.getBirthDate(), joueur.getContractStartDate(), joueur.getContractEndDate());
 				Result resJou = DatabaseAccess.getInstance().getData(reqJou);
-				resJou.getResultSet().close();
 				if (resJou.isError()) {
 					erreurAjoutEquipe(res.getInteger());
 					error("Erreur dans la creation des equipes veuillez ressayer plus tard");
